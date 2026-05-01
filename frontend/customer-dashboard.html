@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T&A IntelliMart - Customer Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fdf2f8 0%, #fbcfe8 50%, #f9a8d4 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 20px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(236, 72, 153, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo { display: flex; align-items: center; gap: 15px; }
+
+    .logo-icon {
+      width: 45px; height: 45px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.3rem;
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+    }
+
+    .logo-text {
+      font-size: 1.6rem; font-weight: 800;
+      background: linear-gradient(135deg, #ec4899, #db2777, #be185d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .user-profile {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 18px;
+      background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+      border-radius: 50px;
+      border: 2px solid #fce7f3;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-profile:hover { border-color: #ec4899; transform: translateY(-2px); }
+
+    .user-avatar {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 600;
+    }
+
+    .user-name { font-weight: 600; color: #831843; font-size: 0.9rem; }
+
+    .logout-btn {
+      padding: 8px 18px;
+      background: white;
+      color: #ec4899;
+      border: 2px solid #ec4899;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .logout-btn:hover {
+      background: #ec4899;
+      color: white;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 15px; }
+
+    /* Navigation */
+    .nav-bar {
+      background: white;
+      padding: 12px 60px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 40px;
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.1);
+      position: sticky;
+      top: 85px;
+      z-index: 99;
+    }
+
+    .nav-item {
+      position: relative;
+      padding: 10px 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #831843;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ec4899, #db2777);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .nav-item:hover::before, .nav-item.active::before { width: 80%; }
+    .nav-item:hover { color: #ec4899; background: rgba(236, 72, 153, 0.05); }
+    .nav-item.active { color: #ec4899; background: rgba(236, 72, 153, 0.1); }
+    .nav-item i { margin-right: 8px; }
+
+    /* Main Content */
+    .main-content { padding: 40px 60px; max-width: 1400px; margin: 0 auto; }
+
+    /* Hero */
+    .hero-section {
+      background: white;
+      border-radius: 30px;
+      padding: 50px;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 40px rgba(236, 72, 153, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-content { flex: 1; z-index: 1; }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #ec4899;
+      margin-bottom: 15px;
+      border: 1px solid #fce7f3;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #831843;
+      line-height: 1.3;
+      margin-bottom: 15px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-description {
+      font-size: 1rem;
+      color: #be185d;
+      line-height: 1.8;
+      margin-bottom: 25px;
+      max-width: 500px;
+    }
+
+    .hero-buttons { display: flex; gap: 15px; }
+
+    .btn-primary {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5); }
+
+    .btn-secondary {
+      padding: 12px 30px;
+      background: white;
+      color: #ec4899;
+      border: 2px solid #ec4899;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-secondary:hover { background: #fdf2f8; transform: translateY(-3px); }
+
+    .hero-image { flex: 1; display: flex; justify-content: center; align-items: center; z-index: 1; }
+
+    .hero-graphic {
+      width: 280px; height: 280px;
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8, #f9a8d4);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+    .hero-graphic i { font-size: 6rem; color: #ec4899; opacity: 0.8; }
+
+    .floating-card {
+      position: absolute;
+      background: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .floating-card:nth-child(1) { top: 20px; right: -30px; animation-delay: 0s; }
+    .floating-card:nth-child(2) { bottom: 40px; left: -40px; animation-delay: 1s; }
+
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+    .floating-card i { font-size: 1.3rem; color: #ec4899; }
+    .floating-card span { font-weight: 600; color: #831843; font-size: 0.85rem; }
+
+    /* Sections */
+    .section {
+      background: white;
+      border-radius: 30px;
+      padding: 50px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 40px rgba(236, 72, 153, 0.15);
+      display: none;
+    }
+
+    .section.active { display: block; animation: fadeIn 0.5s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header { text-align: center; margin-bottom: 40px; }
+
+    .section-title { font-size: 2.2rem; font-weight: 800; color: #831843; margin-bottom: 10px; }
+
+    .section-subtitle { font-size: 1rem; color: #be185d; max-width: 600px; margin: 0 auto; }
+
+    /* About Us */
+    .about-content { display: flex; gap: 50px; align-items: center; }
+    .about-text { flex: 1; }
+    .about-text p { font-size: 1.1rem; color: #831843; line-height: 2; margin-bottom: 25px; }
+
+    .about-features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+    .feature-card {
+      background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+      padding: 20px;
+      border-radius: 18px;
+      border: 2px solid #fce7f3;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      border-color: #ec4899;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(236, 72, 153, 0.2);
+    }
+
+    .feature-icon {
+      width: 50px; height: 50px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+
+    .feature-title { font-size: 1.1rem; font-weight: 700; color: #831843; margin-bottom: 6px; }
+    .feature-description { font-size: 0.9rem; color: #be185d; line-height: 1.5; }
+
+    .about-visual { flex: 1; display: flex; justify-content: center; align-items: center; }
+
+    /* ========== NEW GEN-Z AESTHETIC CARD ========== */
+    .aesthetic-card {
+      width: 320px;
+      height: 400px;
+      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f9a8d4 100%);
+      border-radius: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 30px;
+      box-shadow: 0 25px 60px rgba(236, 72, 153, 0.3);
+      overflow: hidden;
+    }
+
+    .aesthetic-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 40%);
+      animation: shimmer 5s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.5; }
+      50% { transform: translate(30px, 30px) rotate(180deg); opacity: 1; }
+    }
+
+    .aesthetic-card::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px dashed rgba(255, 255, 255, 0.5);
+      border-radius: 40px;
+      animation: rotate 25s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .shopping-scene {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      z-index: 2;
+    }
+
+    .main-emoji {
+      font-size: 9rem;
+      animation: bounce 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 15px 25px rgba(236, 72, 153, 0.4));
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) scale(1) rotate(-5deg); }
+      50% { transform: translateY(-20px) scale(1.08) rotate(5deg); }
+    }
+
+    .sparkle {
+      position: absolute;
+      font-size: 2rem;
+      animation: sparkleFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 5px 10px rgba(236, 72, 153, 0.3));
+    }
+
+    .sparkle-1 { top: 5%; left: 10%; animation-delay: 0s; }
+    .sparkle-2 { top: 15%; right: 5%; animation-delay: 0.5s; }
+    .sparkle-3 { bottom: 25%; left: 0%; animation-delay: 1s; }
+    .sparkle-4 { bottom: 10%; right: 10%; animation-delay: 1.5s; }
+    .sparkle-5 { top: 50%; right: -5%; animation-delay: 2s; }
+    .sparkle-6 { top: 45%; left: -5%; animation-delay: 2.5s; }
+
+    @keyframes sparkleFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.7; }
+      50% { transform: translateY(-25px) rotate(180deg) scale(1.3); opacity: 1; }
+    }
+
+    .vibe-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      z-index: 2;
+      position: relative;
+    }
+
+    .vibe-tag {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #ec4899;
+      border: 2px solid rgba(236, 72, 153, 0.2);
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.25);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .vibe-tag:hover {
+      transform: translateY(-5px) scale(1.05);
+      background: white;
+      box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
+    }
+
+    /* Category */
+    .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+
+    .category-card {
+      background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+      padding: 35px 25px;
+      border-radius: 22px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: all 0.4s ease;
+      cursor: pointer;
+    }
+
+    .category-card:hover {
+      border-color: #ec4899;
+      transform: translateY(-10px);
+      box-shadow: 0 20px 50px rgba(236, 72, 153, 0.25);
+    }
+
+    .category-icon {
+      width: 70px; height: 70px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+      color: white; font-size: 1.8rem;
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3);
+    }
+
+    .category-name { font-size: 1.15rem; font-weight: 700; color: #831843; margin-bottom: 8px; }
+    .category-count { font-size: 0.9rem; color: #be185d; }
+
+    /* Analysis */
+    .analysis-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+
+    .analysis-card {
+      background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+      padding: 30px;
+      border-radius: 22px;
+      border: 2px solid #fce7f3;
+      transition: all 0.3s ease;
+    }
+
+    .analysis-card:hover { border-color: #ec4899; transform: translateY(-5px); }
+
+    .analysis-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .analysis-title { font-size: 1.15rem; font-weight: 700; color: #831843; }
+
+    .analysis-icon {
+      width: 45px; height: 45px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.1rem;
+    }
+
+    .analysis-chart {
+      height: 150px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    .chart-bar {
+      width: 40px;
+      background: linear-gradient(180deg, #ec4899, #db2777);
+      border-radius: 8px 8px 0 0;
+      transition: height 0.5s ease;
+    }
+
+    .price-trends { display: flex; flex-direction: column; gap: 15px; }
+
+    .trend-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid #fce7f3;
+    }
+
+    .trend-product { display: flex; align-items: center; gap: 12px; }
+
+    .trend-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #ec4899;
+    }
+
+    .trend-name { font-weight: 600; color: #831843; font-size: 0.95rem; }
+    .trend-price { font-weight: 700; color: #ec4899; }
+
+    .trend-change { font-size: 0.85rem; padding: 4px 10px; border-radius: 8px; margin-left: 8px; }
+    .trend-change.up { background: #dcfce7; color: #166534; }
+    .trend-change.down { background: #fee2e2; color: #991b1b; }
+
+    /* Review */
+    .review-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+
+    .review-card {
+      background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+      padding: 30px;
+      border-radius: 22px;
+      border: 2px solid #fce7f3;
+      transition: all 0.3s ease;
+    }
+
+    .review-card:hover { border-color: #ec4899; transform: translateY(-5px); }
+
+    .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+
+    .review-avatar {
+      width: 50px; height: 50px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700;
+    }
+
+    .review-info h4 { font-size: 1.1rem; color: #831843; margin-bottom: 4px; }
+    .review-info span { font-size: 0.85rem; color: #be185d; }
+
+    .review-stars { margin-bottom: 15px; }
+    .review-stars i { color: #fbbf24; font-size: 1rem; margin-right: 3px; }
+
+    .review-text { font-size: 0.95rem; color: #831843; line-height: 1.7; }
+
+    .review-product {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 15px; padding-top: 15px;
+      border-top: 1px solid #fce7f3;
+    }
+
+    .review-product i { color: #ec4899; }
+    .review-product span { font-size: 0.9rem; color: #be185d; }
+
+    /* Footer */
+    .footer {
+      background: white;
+      padding: 30px 60px;
+      text-align: center;
+      margin-top: 40px;
+      border-radius: 30px 30px 0 0;
+      box-shadow: 0 -10px 40px rgba(236, 72, 153, 0.15);
+    }
+
+    .footer-content {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; color: #831843; font-size: 0.9rem;
+    }
+
+    .footer-content i { color: #ec4899; }
+
+    @media (max-width: 1024px) {
+      .category-grid { grid-template-columns: repeat(2, 1fr); }
+      .analysis-container { grid-template-columns: 1fr; }
+      .review-container { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+      .nav-bar { padding: 10px 20px; gap: 20px; top: 130px; }
+      .nav-item { padding: 8px 15px; font-size: 0.9rem; }
+      .main-content { padding: 20px; }
+      .hero-section { flex-direction: column; padding: 30px; }
+      .hero-title { font-size: 1.8rem; }
+      .about-content { flex-direction: column; }
+      .category-grid { grid-template-columns: 1fr; }
+      .review-container { grid-template-columns: 1fr; }
+      .about-features { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-logo">
+      <div class="logo-icon"><i class="fas fa-shopping-bag"></i></div>
+      <span class="logo-text">T&A IntelliMart</span>
+    </div>
+    <div class="header-actions">
+      <div class="user-profile">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <span class="user-name" id="userName">Customer</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <div class="nav-item active" onclick="showSection('home', this)">
+      <i class="fas fa-home"></i> Home
+    </div>
+    <div class="nav-item" onclick="showSection('about', this)">
+      <i class="fas fa-info-circle"></i> About Us
+    </div>
+    <div class="nav-item" onclick="showSection('category', this)">
+      <i class="fas fa-th-large"></i> Category
+    </div>
+    <div class="nav-item" onclick="showSection('analysis', this)">
+      <i class="fas fa-chart-line"></i> Analysis
+    </div>
+    <div class="nav-item" onclick="showSection('review', this)">
+      <i class="fas fa-star"></i> Review
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Hero -->
+    <section class="hero-section" id="home-section">
+      <div class="hero-content">
+        <span class="hero-badge"><i class="fas fa-sparkles"></i> Smart Shopping Platform</span>
+        <h1 class="hero-title">Discover the Best <span>Deals</span> with Smart Analysis</h1>
+        <p class="hero-description">
+          We analyze thousands of products and reviews to bring you the best prices and personalized recommendations. Shop smarter with T&A IntelliMart.
+        </p>
+        <div class="hero-buttons">
+          <button class="btn-primary" onclick="showSection('category', document.querySelectorAll('.nav-item')[2])">
+            <i class="fas fa-shopping-cart"></i> Start Shopping
+          </button>
+          <button class="btn-secondary" onclick="showSection('analysis', document.querySelectorAll('.nav-item')[3])">
+            <i class="fas fa-chart-bar"></i> View Analysis
+          </button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-graphic">
+          <i class="fas fa-shopping-bag"></i>
+          <div class="floating-card"><i class="fas fa-tags"></i><span>50% OFF</span></div>
+          <div class="floating-card"><i class="fas fa-truck"></i><span>Free Delivery</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Us -->
+    <section class="section" id="about-section">
+      <div class="section-header">
+        <h2 class="section-title">About Us</h2>
+        <p class="section-subtitle">Learn more about our smart e-commerce platform</p>
+      </div>
+      <div class="about-content">
+        <div class="about-text">
+          <p>We are a smart e-commerce platform designed to help customers make better purchasing decisions. Our system analyzes product data and customer reviews to provide optimized pricing and personalized recommendations, ensuring a better shopping experience.</p>
+          <div class="about-features">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-brain"></i></div>
+              <h3 class="feature-title">Smart Analysis</h3>
+              <p class="feature-description">Advanced algorithms analyze market trends and pricing patterns</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-tags"></i></div>
+              <h3 class="feature-title">Best Prices</h3>
+              <p class="feature-description">We compare prices across multiple vendors to find the best deals</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-comments"></i></div>
+              <h3 class="feature-title">Real Reviews</h3>
+              <p class="feature-description">Authentic customer reviews help you make informed decisions</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-heart"></i></div>
+              <h3 class="feature-title">Personalized</h3>
+              <p class="feature-description">Recommendations tailored to your preferences and history</p>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual">
+          <!-- 🎨 NEW AESTHETIC GEN-Z SHOPPING CARD -->
+          <div class="aesthetic-card">
+            <div class="shopping-scene">
+              <div class="main-emoji">🛍️</div>
+              <div class="sparkle sparkle-1">✨</div>
+              <div class="sparkle sparkle-2">💖</div>
+              <div class="sparkle sparkle-3">🌸</div>
+              <div class="sparkle sparkle-4">⭐</div>
+              <div class="sparkle sparkle-5">💫</div>
+              <div class="sparkle sparkle-6">🎀</div>
+            </div>
+            <div class="vibe-tags">
+              <span class="vibe-tag">#ShopSmart</span>
+              <span class="vibe-tag">#BestDeals</span>
+              <span class="vibe-tag">#Aesthetic</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Category -->
+    <section class="section" id="category-section">
+      <div class="section-header">
+        <h2 class="section-title">Shop by Category</h2>
+        <p class="section-subtitle">Browse our wide range of product categories</p>
+      </div>
+      <div class="category-grid">
+        <div class="category-card" onclick="alert('Electronics products will be shown here')">
+          <div class="category-icon"><i class="fas fa-mobile-alt"></i></div>
+          <h3 class="category-name">Electronics</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+        <div class="category-card" onclick="alert('Grocery products will be shown here')">
+          <div class="category-icon"><i class="fas fa-shopping-basket"></i></div>
+          <h3 class="category-name">Grocery</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+        <div class="category-card" onclick="alert('Snacks products will be shown here')">
+          <div class="category-icon"><i class="fas fa-cookie-bite"></i></div>
+          <h3 class="category-name">Snacks</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+        <div class="category-card" onclick="alert('Beverages products will be shown here')">
+          <div class="category-icon"><i class="fas fa-coffee"></i></div>
+          <h3 class="category-name">Beverages</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+        <div class="category-card" onclick="alert('Fruits & Vegetables will be shown here')">
+          <div class="category-icon"><i class="fas fa-apple-alt"></i></div>
+          <h3 class="category-name">Fruits & Vegetables</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+        <div class="category-card" onclick="alert('Fashion products will be shown here')">
+          <div class="category-icon"><i class="fas fa-tshirt"></i></div>
+          <h3 class="category-name">Fashion</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+        <div class="category-card" onclick="alert('Home products will be shown here')">
+          <div class="category-icon"><i class="fas fa-home"></i></div>
+          <h3 class="category-name">Home & Living</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+        <div class="category-card" onclick="alert('Beauty products will be shown here')">
+          <div class="category-icon"><i class="fas fa-spa"></i></div>
+          <h3 class="category-name">Beauty</h3>
+          <p class="category-count">Loading...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analysis -->
+    <section class="section" id="analysis-section">
+      <div class="section-header">
+        <h2 class="section-title">Price Analysis</h2>
+        <p class="section-subtitle">Real-time market insights and price trends</p>
+      </div>
+      <div class="analysis-container">
+        <div class="analysis-card">
+          <div class="analysis-header">
+            <h3 class="analysis-title">Price Trends</h3>
+            <div class="analysis-icon"><i class="fas fa-chart-line"></i></div>
+          </div>
+          <div class="analysis-chart">
+            <div class="chart-bar" style="height: 60px;"></div>
+            <div class="chart-bar" style="height: 90px;"></div>
+            <div class="chart-bar" style="height: 75px;"></div>
+            <div class="chart-bar" style="height: 120px;"></div>
+            <div class="chart-bar" style="height: 100px;"></div>
+            <div class="chart-bar" style="height: 85px;"></div>
+            <div class="chart-bar" style="height: 110px;"></div>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <div class="analysis-header">
+            <h3 class="analysis-title">Top Price Drops</h3>
+            <div class="analysis-icon"><i class="fas fa-arrow-down"></i></div>
+          </div>
+          <div class="price-trends">
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-mobile-alt"></i></div>
+                <span class="trend-name">Electronics</span>
+              </div>
+              <div><span class="trend-price">₹806</span><span class="trend-change down">-42%</span></div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-shopping-basket"></i></div>
+                <span class="trend-name">Grocery</span>
+              </div>
+              <div><span class="trend-price">₹355</span><span class="trend-change down">-20%</span></div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-cookie-bite"></i></div>
+                <span class="trend-name">Snacks</span>
+              </div>
+              <div><span class="trend-price">₹496</span><span class="trend-change down">-20%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <div class="analysis-header">
+            <h3 class="analysis-title">Market Statistics</h3>
+            <div class="analysis-icon"><i class="fas fa-chart-pie"></i></div>
+          </div>
+          <div class="price-trends">
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-box"></i></div>
+                <span class="trend-name">Total Products</span>
+              </div>
+              <span class="trend-price">2,00,000+</span>
+            </div>
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-store"></i></div>
+                <span class="trend-name">Active Vendors</span>
+              </div>
+              <span class="trend-price">7</span>
+            </div>
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-users"></i></div>
+                <span class="trend-name">Happy Customers</span>
+              </div>
+              <span class="trend-price">50,000+</span>
+            </div>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <div class="analysis-header">
+            <h3 class="analysis-title">Top Vendors</h3>
+            <div class="analysis-icon"><i class="fas fa-star"></i></div>
+          </div>
+          <div class="price-trends">
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-store"></i></div>
+                <span class="trend-name">Amazon</span>
+              </div>
+              <div><span class="trend-change up">4.8★</span></div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-store"></i></div>
+                <span class="trend-name">Flipkart</span>
+              </div>
+              <div><span class="trend-change up">4.7★</span></div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-product">
+                <div class="trend-icon"><i class="fas fa-store"></i></div>
+                <span class="trend-name">Croma</span>
+              </div>
+              <div><span class="trend-change up">4.5★</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Review -->
+    <section class="section" id="review-section">
+      <div class="section-header">
+        <h2 class="section-title">Customer Reviews</h2>
+        <p class="section-subtitle">See what our customers are saying</p>
+      </div>
+      <div class="review-container">
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-avatar">AK</div>
+            <div class="review-info"><h4>Amit Kumar</h4><span>Verified Buyer</span></div>
+          </div>
+          <div class="review-stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p class="review-text">Amazing platform! The price analysis helped me save ₹5,000 on my purchase. Highly recommended!</p>
+          <div class="review-product"><i class="fas fa-laptop"></i><span>Electronics</span></div>
+        </div>
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-avatar">PS</div>
+            <div class="review-info"><h4>Priya Sharma</h4><span>Verified Buyer</span></div>
+          </div>
+          <div class="review-stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+          </div>
+          <p class="review-text">Love the personalized recommendations! Found great items at unbelievable prices!</p>
+          <div class="review-product"><i class="fas fa-shopping-basket"></i><span>Grocery</span></div>
+        </div>
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-avatar">RS</div>
+            <div class="review-info"><h4>Rahul Singh</h4><span>Verified Buyer</span></div>
+          </div>
+          <div class="review-stars">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p class="review-text">The review analysis feature is fantastic. It helped me choose the best product!</p>
+          <div class="review-product"><i class="fas fa-mobile-alt"></i><span>Electronics</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <i class="fas fa-copyright"></i>
+      <span>2024 T&A IntelliMart. All rights reserved. Smart Shopping Made Simple.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Check if user is logged in
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username') || localStorage.getItem('username');
+    
+    if (!username) {
+      alert('⚠️ Please login first!');
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('userName').textContent = username;
+    }
+
+    // Show specific section
+    function showSection(sectionName, clickedElement) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelector('.hero-section').style.display = 'none';
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+      if (sectionName === 'home') {
+        document.querySelector('.hero-section').style.display = 'flex';
+      } else {
+        const target = document.getElementById(sectionName + '-section');
+        if (target) target.classList.add('active');
+      }
+
+      if (clickedElement) clickedElement.classList.add('active');
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('username');
+        localStorage.removeItem('userType');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Initialize - show home section
+    document.querySelector('.hero-section').style.display = 'flex';
+  </script>
+</body>
+</html>

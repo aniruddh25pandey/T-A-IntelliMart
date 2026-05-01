@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# ML Models (saved .pkl files)
+backend/models/*.pkl
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
