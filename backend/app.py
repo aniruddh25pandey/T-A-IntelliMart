@@ -1,5 +1,6 @@
 """
-T&A IntelliMart - Flask Backend API (COMPLETE with FontAwesome Icons)
+T&A IntelliMart - Flask Backend API
+Complete backend with ML predictions, product search, and business logic
 """
 
 from flask import Flask, request, jsonify
@@ -71,6 +72,7 @@ AUTHORIZED_USERS = {
 # ============================================================
 
 def analyze_sentiment(text):
+    """Analyze sentiment of text"""
     if not text or text.strip() == '':
         return {'label': 'NEUTRAL', 'polarity': 0.0}
     
@@ -88,6 +90,7 @@ def analyze_sentiment(text):
 
 def predict_optimal_price(category, vendor, original_price, rating, review_count, 
                          sentiment_label='POSITIVE', sentiment_polarity=0.5):
+    """Predict optimal price and discount using ML models"""
     try:
         if original_price <= 500:
             price_cat = 'Budget'
@@ -140,11 +143,19 @@ def home():
     return jsonify({
         'status': 'online',
         'service': 'T&A IntelliMart API',
-        'version': '2.0'
+        'version': '2.0',
+        'endpoints': [
+            '/api/login', '/api/categories', '/api/vendors', '/api/stats',
+            '/api/products/<category>', '/api/graphs/<category>', '/api/predict',
+            '/api/recommendations/<category>', '/api/insights/<category>',
+            '/api/sentiment', '/api/search/products', '/api/product/insights',
+            '/api/product/suggestions'
+        ]
     })
 
 @app.route('/api/login', methods=['POST'])
 def login():
+    """User authentication endpoint"""
     data = request.json
     username = data.get('username', '').lower()
     password = data.get('password', '')
@@ -173,6 +184,7 @@ def login():
 
 @app.route('/api/categories')
 def get_categories():
+    """Get all available categories with product counts"""
     category_data = []
     for cat in MAIN_CATEGORIES:
         count = len(df_clean[df_clean['Category'] == cat])
@@ -187,12 +199,18 @@ def get_categories():
 
 @app.route('/api/vendors')
 def get_vendors():
+    """Get all vendors with product counts"""
     vendors = df_clean['vendors'].value_counts().to_dict()
     vendor_data = [{'name': k, 'count': int(v)} for k, v in vendors.items()]
-    return jsonify({'success': True, 'vendors': vendor_data, 'total': len(vendor_data)})
+    return jsonify({
+        'success': True,
+        'vendors': vendor_data,
+        'total': len(vendor_data)
+    })
 
 @app.route('/api/stats')
 def get_stats():
+    """Get overall statistics"""
     return jsonify({
         'success': True,
         'total_products': len(df_clean),
@@ -208,6 +226,7 @@ def get_stats():
 
 @app.route('/api/products/<category>')
 def get_products_by_category(category):
+    """Get top products in a specific category"""
     category_products = df_clean[df_clean['Category'] == category]
     
     if len(category_products) == 0:
@@ -238,18 +257,20 @@ def get_products_by_category(category):
 
 @app.route('/api/graphs/<category>')
 def get_graphs_data(category):
+    """Get data for 4 different graphs for a category"""
     category_data = df_clean[df_clean['Category'] == category]
     
     if len(category_data) == 0:
         return jsonify({'success': False, 'message': 'Category not found'}), 404
     
+    # Graph 1: Price vs Product Name (Top 10)
     top_products = category_data.nlargest(10, 'Rating')
-    
     price_vs_product = {
         'products': [str(p)[:30] for p in top_products['product_name'].tolist()],
         'prices': top_products['Final_Price'].round(2).tolist()
     }
     
+    # Graph 2 & 3: Sample data for scatter plots
     sample_data = category_data.sample(min(100, len(category_data)))
     
     discount_vs_price = {
@@ -264,6 +285,7 @@ def get_graphs_data(category):
         'vendors': sample_data['vendors'].tolist()
     }
     
+    # Graph 4: Prices and Discounts by Vendor
     vendor_prices = category_data.groupby('vendors').agg({
         'Final_Price': 'mean',
         'Discount_Percentage': 'mean'
@@ -287,6 +309,7 @@ def get_graphs_data(category):
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
+    """Predict optimal price and discount for custom input"""
     data = request.json
     result = predict_optimal_price(
         category=data.get('category'),
@@ -305,6 +328,7 @@ def predict():
 
 @app.route('/api/recommendations/<category>')
 def get_recommendations(category):
+    """Get ML-powered price recommendations for top products in category"""
     category_data = df_clean[df_clean['Category'] == category]
     
     if len(category_data) == 0:
@@ -361,6 +385,7 @@ def get_recommendations(category):
 
 @app.route('/api/insights/<category>')
 def get_insights(category):
+    """Get business insights for a category"""
     category_data = df_clean[df_clean['Category'] == category]
     
     if len(category_data) == 0:
@@ -391,8 +416,8 @@ def get_insights(category):
             'price': round(float(top_product['Final_Price']), 2)
         },
         'insights_messages': [
-            f'<i class="fas fa-chart-bar text-orange-500 mr-2"></i>Average price in {category}: ₹{avg_price:,.2f}',
-            f'<i class="fas fa-tag text-green-500 mr-2"></i>Standard discount offered: {avg_discount:.1f}%',
+            f'<i class="fas fa-chart-bar text-purple-500 mr-2"></i>Average price in {category}: ₹{avg_price:,.2f}',
+            f'<i class="fas fa-tag text-teal-500 mr-2"></i>Standard discount offered: {avg_discount:.1f}%',
             f'<i class="fas fa-star text-yellow-500 mr-2"></i>Category average rating: {avg_rating:.2f}/5',
             f'<i class="fas fa-heart text-pink-500 mr-2"></i>{positive_pct:.1f}% customers are happy with {category} products',
             f'<i class="fas fa-trophy text-amber-500 mr-2"></i>Best vendor in {category}: {best_vendor} ({best_vendor_rating:.2f} stars)',
@@ -405,6 +430,7 @@ def get_insights(category):
 
 @app.route('/api/sentiment', methods=['POST'])
 def analyze_review_sentiment():
+    """Analyze sentiment of customer review text"""
     data = request.json
     review = data.get('review', '')
     result = analyze_sentiment(review)
@@ -412,6 +438,7 @@ def analyze_review_sentiment():
 
 @app.route('/api/search/products', methods=['GET'])
 def search_products():
+    """Search products by name"""
     query = request.args.get('q', '').strip().lower()
     
     if not query or len(query) < 2:
@@ -459,14 +486,17 @@ def search_products():
 
 @app.route('/api/product/insights', methods=['POST'])
 def get_product_insights():
+    """Get detailed insights for a specific product"""
     data = request.json
     product_name = data.get('product_name', '').strip()
     
     if not product_name:
         return jsonify({'success': False, 'message': 'Product name is required'}), 400
     
+    # Try exact match first
     product_match = df_clean[df_clean['product_name'] == product_name]
     
+    # If no exact match, try partial match
     if len(product_match) == 0:
         product_match = df_clean[
             df_clean['product_name'].str.lower().str.contains(
@@ -486,6 +516,7 @@ def get_product_insights():
     product_price = float(product['Final_Price'])
     price_comparison = ((product_price - avg_category_price) / avg_category_price * 100)
     
+    # Get ML prediction
     try:
         prediction = predict_optimal_price(
             category=product['Category'],
@@ -499,6 +530,7 @@ def get_product_insights():
     except Exception as e:
         prediction = {'error': str(e)}
     
+    # Find similar products
     price_range = 0.3
     min_price = product_price * (1 - price_range)
     max_price = product_price * (1 + price_range)
@@ -519,6 +551,7 @@ def get_product_insights():
             'discount': round(float(sim['Discount_Percentage']), 2)
         })
     
+    # Determine action based on ML prediction
     current_price = product_price
     if 'predicted_price' in prediction:
         optimal_price = prediction['predicted_price']
@@ -529,11 +562,11 @@ def get_product_insights():
         elif optimal_price > current_price * 1.05:
             action = 'INCREASE'
             impact = round((optimal_price - current_price) / current_price * 100, 2)
-            action_message = f'<i class="fas fa-arrow-up text-green-500 mr-2"></i>Can increase price by {impact}% (demand is high)'
+            action_message = f'<i class="fas fa-arrow-up text-teal-500 mr-2"></i>Can increase price by {impact}% (demand is high)'
         else:
             action = 'MAINTAIN'
             impact = 0
-            action_message = '<i class="fas fa-check-circle text-green-500 mr-2"></i>Current pricing is optimal'
+            action_message = '<i class="fas fa-check-circle text-teal-500 mr-2"></i>Current pricing is optimal'
     else:
         action = 'MAINTAIN'
         impact = 0
@@ -577,10 +610,10 @@ def get_product_insights():
         },
         'similar_products': similar_list,
         'insights': [
-            f'<i class="fas fa-chart-bar text-orange-500 mr-2"></i>This product is priced {abs(price_comparison):.1f}% {"above" if price_comparison > 0 else "below"} category average',
+            f'<i class="fas fa-chart-bar text-purple-500 mr-2"></i>This product is priced {abs(price_comparison):.1f}% {"above" if price_comparison > 0 else "below"} category average',
             f'<i class="fas fa-store text-blue-500 mr-2"></i>Sold by: {product["vendors"]}',
             f'<i class="fas fa-star text-yellow-500 mr-2"></i>Rating: {float(product["Rating"]):.2f}/5 ({"Excellent" if product["Rating"] > 4.5 else "Good" if product["Rating"] > 3.5 else "Average"})',
-            f'<i class="fas fa-comment-dots text-purple-500 mr-2"></i>Customer sentiment: {product["Sentiment_Label"]} ({float(product["Sentiment_Polarity"]):.2f})',
+            f'<i class="fas fa-comment-dots text-pink-500 mr-2"></i>Customer sentiment: {product["Sentiment_Label"]} ({float(product["Sentiment_Polarity"]):.2f})',
             f'<i class="fas fa-robot text-indigo-500 mr-2"></i>ML Recommendation: {action_message}',
             f'<i class="fas fa-trophy text-amber-500 mr-2"></i>Best vendor in this category: {best_vendor_in_cat} ({best_vendor_rating} stars)',
             f'<i class="fas fa-layer-group text-teal-500 mr-2"></i>{len(similar_products)} similar products available in this category'
@@ -589,6 +622,7 @@ def get_product_insights():
 
 @app.route('/api/product/suggestions', methods=['GET'])
 def product_suggestions():
+    """Auto-complete suggestions for product search"""
     query = request.args.get('q', '').strip().lower()
     
     if not query or len(query) < 2:
