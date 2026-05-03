@@ -1,6 +1,5 @@
 """
-T&A IntelliMart - Flask Backend API
-Complete backend with ML predictions, product search, and business logic
+T&A IntelliMart - Flask Backend API (COMPLETE with Reviews + Sample Products)
 """
 
 from flask import Flask, request, jsonify
@@ -9,6 +8,9 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+import sqlite3
+import random
+from datetime import datetime
 from textblob import TextBlob
 import warnings
 warnings.filterwarnings('ignore')
@@ -16,16 +18,13 @@ warnings.filterwarnings('ignore')
 app = Flask(__name__)
 CORS(app)
 
-# ============================================================
-# LOAD MODELS AND DATA
-# ============================================================
-
 print("=" * 80)
 print("T&A IntelliMart Backend Starting...")
 print("=" * 80)
 
 MODELS_DIR = 'models'
 DATASET_PATH = '../DATASET/dataset_with_sentiment.csv'
+DB_PATH = 'reviews.db'
 
 print("\nLoading ML Models...")
 try:
@@ -55,6 +54,108 @@ MAIN_CATEGORIES = ['Electronics', 'Grocery', 'Snacks', 'Beverages',
 df_clean = df[df['Category'].isin(MAIN_CATEGORIES)].copy()
 print(f"Clean data: {len(df_clean):,} products in main categories")
 
+# ============================================================
+# PRODUCT NAME TEMPLATES
+# ============================================================
+
+PRODUCT_NAMES = {
+    'Electronics': ['Smartphone', 'Laptop', 'Headphones', 'Smartwatch', 'Tablet', 'Camera', 'Speaker', 'Gaming Console', 'Keyboard', 'Mouse', 'Monitor', 'Router', 'Power Bank', 'Charger', 'USB Cable'],
+    'Grocery': ['Rice Bag', 'Wheat Flour', 'Cooking Oil', 'Sugar Pack', 'Salt Container', 'Tea Bags', 'Coffee Pack', 'Biscuits', 'Dal Pack', 'Spices Set', 'Pasta', 'Noodles', 'Bread Loaf', 'Eggs Pack', 'Milk Carton'],
+    'Snacks': ['Potato Chips', 'Cookies Pack', 'Chocolate Bar', 'Namkeen Mix', 'Popcorn', 'Wafers', 'Crackers', 'Nut Mix', 'Candy Pack', 'Puffs', 'Sev Mixture', 'Bhujia', 'Trail Mix', 'Granola Bar', 'Pretzels'],
+    'Beverages': ['Cola Bottle', 'Juice Pack', 'Energy Drink', 'Coffee', 'Tea Pack', 'Smoothie', 'Mineral Water', 'Soda Can', 'Lemonade', 'Iced Tea', 'Protein Shake', 'Milkshake', 'Sports Drink', 'Coconut Water', 'Flavored Water'],
+    'Fruits & Vegetables': ['Fresh Apples', 'Bananas', 'Oranges', 'Mangoes', 'Tomatoes', 'Potatoes', 'Onions', 'Carrots', 'Spinach', 'Broccoli', 'Cucumber', 'Bell Peppers', 'Lettuce', 'Grapes', 'Strawberries'],
+    'Fashion': ['Stylish Shirt', 'Denim Jeans', 'Summer Dress', 'Leather Jacket', 'Sneakers', 'Formal Shoes', 'Handbag', 'Wallet', 'Sunglasses', 'Wrist Watch', 'Belt', 'Scarf', 'Hat', 'Kurta', 'Saree'],
+    'Home & Living': ['Sofa Set', 'Dining Table', 'Bed Sheet Set', 'Pillow Set', 'Curtains', 'Wall Clock', 'Table Lamp', 'Flower Vase', 'Cushion Cover', 'Floor Rug', 'Photo Frame', 'Scented Candles', 'Storage Box', 'Wall Mirror', 'Office Chair'],
+    'Beauty': ['Face Wash', 'Moisturizer', 'Lipstick', 'Perfume', 'Shampoo', 'Conditioner', 'Hair Oil', 'Body Lotion', 'Sunscreen', 'Face Mask', 'Nail Polish', 'Kajal', 'Foundation', 'Makeup Kit', 'Deodorant'],
+    'Books': ['Fiction Novel', 'Self Help Book', 'Cookbook', 'Biography', 'History Book', 'Science Fiction', 'Mystery Novel', 'Comic Book', 'Dictionary', 'Atlas', 'Poetry Collection', 'Travel Guide', 'Business Book', 'Children Book', 'Art Book'],
+    'Clothing': ['T-Shirt', 'Hoodie', 'Jacket', 'Sweater', 'Shorts', 'Skirt', 'Blouse', 'Pants', 'Leggings', 'Pajamas', 'Socks', 'Gloves', 'Coat', 'Blazer', 'Tracksuit']
+}
+
+def get_product_name(row, index):
+    """Generate meaningful product name"""
+    product_name = str(row.get('product_name', '')).strip()
+    category = row.get('Category', 'Product')
+    vendor = row.get('vendors', 'Store')
+    
+    bad_names = ['nan', 'nan_missing', 'none', '', 'null']
+    if not product_name or product_name.lower() in bad_names or product_name == category:
+        templates = PRODUCT_NAMES.get(category, ['Product'])
+        template_name = templates[index % len(templates)]
+        product_name = f"{template_name} by {vendor}"
+    
+    if len(product_name) > 80:
+        product_name = product_name[:80] + '...'
+    
+    return product_name
+
+def generate_sample_products(category):
+    """Generate sample products for categories with no data"""
+    templates = PRODUCT_NAMES.get(category, ['Product A', 'Product B', 'Product C'])
+    vendors_list = ['Amazon', 'Flipkart', 'Croma', 'Reliance Digital', 'Myntra', 'Nykaa', 'BigBasket', 'Zepto']
+    
+    price_ranges = {
+        'Electronics': (500, 50000),
+        'Grocery': (50, 2000),
+        'Snacks': (20, 500),
+        'Beverages': (30, 800),
+        'Fruits & Vegetables': (50, 1000),
+        'Fashion': (200, 5000),
+        'Home & Living': (500, 25000),
+        'Beauty': (100, 3000),
+        'Books': (100, 1500),
+        'Clothing': (300, 4000)
+    }
+    
+    min_price, max_price = price_ranges.get(category, (100, 5000))
+    
+    products = []
+    for i, template in enumerate(templates):
+        vendor = random.choice(vendors_list)
+        original_price = round(random.uniform(min_price, max_price), 2)
+        discount = round(random.uniform(5, 35), 2)
+        final_price = round(original_price * (1 - discount/100), 2)
+        rating = round(random.uniform(3.5, 5.0), 1)
+        reviews = random.randint(50, 5000)
+        
+        products.append({
+            'id': i,
+            'name': f"{template} by {vendor}",
+            'category': category,
+            'original_price': original_price,
+            'final_price': final_price,
+            'discount': discount,
+            'rating': rating,
+            'reviews': reviews,
+            'vendor': vendor,
+            'sentiment': 'POSITIVE' if rating >= 4 else 'NEUTRAL'
+        })
+    
+    return products
+
+# ============================================================
+# DATABASE
+# ============================================================
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_name TEXT NOT NULL,
+            category TEXT NOT NULL,
+            username TEXT NOT NULL,
+            rating INTEGER NOT NULL,
+            review_text TEXT NOT NULL,
+            review_date TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+    print("SQLite database initialized!")
+
+init_db()
+
 print("\n" + "=" * 80)
 print("Backend Ready!")
 print("=" * 80)
@@ -72,25 +173,20 @@ AUTHORIZED_USERS = {
 # ============================================================
 
 def analyze_sentiment(text):
-    """Analyze sentiment of text"""
     if not text or text.strip() == '':
         return {'label': 'NEUTRAL', 'polarity': 0.0}
-    
     blob = TextBlob(text)
     polarity = blob.sentiment.polarity
-    
     if polarity > 0.1:
         label = 'POSITIVE'
     elif polarity < -0.1:
         label = 'NEGATIVE'
     else:
         label = 'NEUTRAL'
-    
     return {'label': label, 'polarity': round(polarity, 4)}
 
 def predict_optimal_price(category, vendor, original_price, rating, review_count, 
                          sentiment_label='POSITIVE', sentiment_polarity=0.5):
-    """Predict optimal price and discount using ML models"""
     try:
         if original_price <= 500:
             price_cat = 'Budget'
@@ -134,28 +230,21 @@ def predict_optimal_price(category, vendor, original_price, rating, review_count
     except Exception as e:
         return {'error': str(e)}
 
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
 # ============================================================
 # API ENDPOINTS
 # ============================================================
 
 @app.route('/')
 def home():
-    return jsonify({
-        'status': 'online',
-        'service': 'T&A IntelliMart API',
-        'version': '2.0',
-        'endpoints': [
-            '/api/login', '/api/categories', '/api/vendors', '/api/stats',
-            '/api/products/<category>', '/api/graphs/<category>', '/api/predict',
-            '/api/recommendations/<category>', '/api/insights/<category>',
-            '/api/sentiment', '/api/search/products', '/api/product/insights',
-            '/api/product/suggestions'
-        ]
-    })
+    return jsonify({'status': 'online', 'service': 'T&A IntelliMart API', 'version': '2.2'})
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    """User authentication endpoint"""
     data = request.json
     username = data.get('username', '').lower()
     password = data.get('password', '')
@@ -164,53 +253,33 @@ def login():
     if username in AUTHORIZED_USERS:
         if role == 'supplier' or role == 'admin':
             if AUTHORIZED_USERS[username] == password:
-                return jsonify({
-                    'success': True,
-                    'message': 'Admin login successful',
-                    'user': username,
-                    'role': 'admin'
-                })
+                return jsonify({'success': True, 'message': 'Admin login successful', 'user': username, 'role': 'admin'})
             else:
                 return jsonify({'success': False, 'message': 'Invalid password'}), 401
         else:
-            return jsonify({
-                'success': True,
-                'message': 'Customer login successful',
-                'user': username,
-                'role': 'customer'
-            })
+            return jsonify({'success': True, 'message': 'Customer login successful', 'user': username, 'role': 'customer'})
     else:
         return jsonify({'success': False, 'message': 'User not authorized'}), 401
 
 @app.route('/api/categories')
 def get_categories():
-    """Get all available categories with product counts"""
     category_data = []
     for cat in MAIN_CATEGORIES:
         count = len(df_clean[df_clean['Category'] == cat])
-        if count > 0:
-            category_data.append({'name': cat, 'count': count})
-    
-    return jsonify({
-        'success': True,
-        'categories': category_data,
-        'total': len(category_data)
-    })
+        # Always show categories - use sample count of 15 if empty
+        if count == 0:
+            count = 15
+        category_data.append({'name': cat, 'count': count})
+    return jsonify({'success': True, 'categories': category_data, 'total': len(category_data)})
 
 @app.route('/api/vendors')
 def get_vendors():
-    """Get all vendors with product counts"""
     vendors = df_clean['vendors'].value_counts().to_dict()
     vendor_data = [{'name': k, 'count': int(v)} for k, v in vendors.items()]
-    return jsonify({
-        'success': True,
-        'vendors': vendor_data,
-        'total': len(vendor_data)
-    })
+    return jsonify({'success': True, 'vendors': vendor_data, 'total': len(vendor_data)})
 
 @app.route('/api/stats')
 def get_stats():
-    """Get overall statistics"""
     return jsonify({
         'success': True,
         'total_products': len(df_clean),
@@ -226,18 +295,25 @@ def get_stats():
 
 @app.route('/api/products/<category>')
 def get_products_by_category(category):
-    """Get top products in a specific category"""
     category_products = df_clean[df_clean['Category'] == category]
     
+    # Generate sample products if category is empty
     if len(category_products) == 0:
-        return jsonify({'success': False, 'message': 'Category not found'}), 404
+        products_list = generate_sample_products(category)
+        return jsonify({
+            'success': True,
+            'category': category,
+            'total_products': len(products_list),
+            'products': products_list
+        })
     
-    top_products = category_products.nlargest(20, 'Rating')
-    
+    top_products = category_products.nlargest(20, 'Rating').reset_index(drop=True)
     products_list = []
-    for _, row in top_products.iterrows():
+    for idx, row in top_products.iterrows():
+        product_name = get_product_name(row, idx)
         products_list.append({
-            'name': str(row['product_name'])[:60],
+            'id': int(idx),
+            'name': product_name,
             'category': row['Category'],
             'original_price': round(float(row['Original_Price']), 2),
             'final_price': round(float(row['Final_Price']), 2),
@@ -247,7 +323,6 @@ def get_products_by_category(category):
             'vendor': row['vendors'],
             'sentiment': row['Sentiment_Label']
         })
-    
     return jsonify({
         'success': True,
         'category': category,
@@ -257,40 +332,32 @@ def get_products_by_category(category):
 
 @app.route('/api/graphs/<category>')
 def get_graphs_data(category):
-    """Get data for 4 different graphs for a category"""
     category_data = df_clean[df_clean['Category'] == category]
-    
     if len(category_data) == 0:
         return jsonify({'success': False, 'message': 'Category not found'}), 404
     
-    # Graph 1: Price vs Product Name (Top 10)
-    top_products = category_data.nlargest(10, 'Rating')
+    top_products = category_data.nlargest(10, 'Rating').reset_index(drop=True)
     price_vs_product = {
-        'products': [str(p)[:30] for p in top_products['product_name'].tolist()],
+        'products': [get_product_name(row, i)[:30] for i, row in top_products.iterrows()],
         'prices': top_products['Final_Price'].round(2).tolist()
     }
     
-    # Graph 2 & 3: Sample data for scatter plots
     sample_data = category_data.sample(min(100, len(category_data)))
-    
     discount_vs_price = {
         'prices': sample_data['Final_Price'].round(2).tolist(),
         'discounts': sample_data['Discount_Percentage'].round(2).tolist(),
         'vendors': sample_data['vendors'].tolist()
     }
-    
     rating_vs_price = {
         'prices': sample_data['Final_Price'].round(2).tolist(),
         'ratings': sample_data['Rating'].round(2).tolist(),
         'vendors': sample_data['vendors'].tolist()
     }
     
-    # Graph 4: Prices and Discounts by Vendor
     vendor_prices = category_data.groupby('vendors').agg({
         'Final_Price': 'mean',
         'Discount_Percentage': 'mean'
     }).reset_index()
-    
     prices_by_vendor = {
         'vendors': vendor_prices['vendors'].tolist(),
         'avg_prices': vendor_prices['Final_Price'].round(2).tolist(),
@@ -309,7 +376,6 @@ def get_graphs_data(category):
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
-    """Predict optimal price and discount for custom input"""
     data = request.json
     result = predict_optimal_price(
         category=data.get('category'),
@@ -320,24 +386,19 @@ def predict():
         sentiment_label=data.get('sentiment_label', 'POSITIVE'),
         sentiment_polarity=float(data.get('sentiment_polarity', 0.5))
     )
-    
     if 'error' in result:
         return jsonify({'success': False, 'message': result['error']}), 400
-    
     return jsonify({'success': True, 'prediction': result})
 
 @app.route('/api/recommendations/<category>')
 def get_recommendations(category):
-    """Get ML-powered price recommendations for top products in category"""
     category_data = df_clean[df_clean['Category'] == category]
-    
     if len(category_data) == 0:
         return jsonify({'success': False, 'message': 'Category not found'}), 404
     
-    top_products = category_data.nlargest(10, 'Review_Count')
-    
+    top_products = category_data.nlargest(10, 'Review_Count').reset_index(drop=True)
     recommendations = []
-    for _, row in top_products.iterrows():
+    for idx, row in top_products.iterrows():
         try:
             prediction = predict_optimal_price(
                 category=row['Category'],
@@ -348,7 +409,6 @@ def get_recommendations(category):
                 sentiment_label=row['Sentiment_Label'],
                 sentiment_polarity=float(row['Sentiment_Polarity'])
             )
-            
             current_price = float(row['Final_Price'])
             optimal_price = prediction['predicted_price']
             
@@ -362,8 +422,9 @@ def get_recommendations(category):
                 action = 'MAINTAIN'
                 impact = 0
             
+            product_name = get_product_name(row, idx)
             recommendations.append({
-                'product_name': str(row['product_name'])[:50],
+                'product_name': product_name[:50],
                 'vendor': row['vendors'],
                 'current_price': round(current_price, 2),
                 'optimal_price': optimal_price,
@@ -374,20 +435,14 @@ def get_recommendations(category):
                 'action': action,
                 'impact_percentage': impact
             })
-        except Exception as e:
+        except Exception:
             continue
     
-    return jsonify({
-        'success': True,
-        'category': category,
-        'recommendations': recommendations
-    })
+    return jsonify({'success': True, 'category': category, 'recommendations': recommendations})
 
 @app.route('/api/insights/<category>')
 def get_insights(category):
-    """Get business insights for a category"""
     category_data = df_clean[df_clean['Category'] == category]
-    
     if len(category_data) == 0:
         return jsonify({'success': False, 'message': 'Category not found'}), 404
     
@@ -395,11 +450,11 @@ def get_insights(category):
     avg_discount = category_data['Discount_Percentage'].mean()
     avg_rating = category_data['Rating'].mean()
     positive_pct = (category_data['Sentiment_Label'] == 'POSITIVE').sum() / len(category_data) * 100
-    
     top_product = category_data.nlargest(1, 'Rating').iloc[0]
-    
     best_vendor = category_data.groupby('vendors')['Rating'].mean().idxmax()
     best_vendor_rating = category_data.groupby('vendors')['Rating'].mean().max()
+    
+    top_product_name = get_product_name(top_product, 0)
     
     insights = {
         'category': category,
@@ -411,7 +466,7 @@ def get_insights(category):
         'best_vendor': best_vendor,
         'best_vendor_rating': round(best_vendor_rating, 2),
         'top_product': {
-            'name': str(top_product['product_name'])[:50],
+            'name': top_product_name[:50],
             'rating': round(float(top_product['Rating']), 2),
             'price': round(float(top_product['Final_Price']), 2)
         },
@@ -425,12 +480,10 @@ def get_insights(category):
             f'<i class="fas fa-bullseye text-red-500 mr-2"></i>Focus on: {"Quality improvement" if avg_rating < 4 else "Brand building"}'
         ]
     }
-    
     return jsonify({'success': True, 'insights': insights})
 
 @app.route('/api/sentiment', methods=['POST'])
 def analyze_review_sentiment():
-    """Analyze sentiment of customer review text"""
     data = request.json
     review = data.get('review', '')
     result = analyze_sentiment(review)
@@ -438,34 +491,23 @@ def analyze_review_sentiment():
 
 @app.route('/api/search/products', methods=['GET'])
 def search_products():
-    """Search products by name"""
     query = request.args.get('q', '').strip().lower()
-    
     if not query or len(query) < 2:
-        return jsonify({
-            'success': False,
-            'message': 'Please enter at least 2 characters'
-        }), 400
+        return jsonify({'success': False, 'message': 'Please enter at least 2 characters'}), 400
     
     matching_products = df_clean[
-        df_clean['product_name'].str.lower().str.contains(query, na=False, regex=False)
-    ]
+        df_clean['product_name'].astype(str).str.lower().str.contains(query, na=False, regex=False)
+    ].reset_index(drop=True)
     
     if len(matching_products) == 0:
-        return jsonify({
-            'success': True,
-            'query': query,
-            'total_found': 0,
-            'products': [],
-            'message': f'No products found matching "{query}"'
-        })
+        return jsonify({'success': True, 'query': query, 'total_found': 0, 'products': []})
     
     results = matching_products.head(20)
-    
     products_list = []
-    for _, row in results.iterrows():
+    for idx, row in results.iterrows():
+        product_name = get_product_name(row, idx)
         products_list.append({
-            'name': str(row['product_name'])[:80],
+            'name': product_name,
             'category': row['Category'],
             'original_price': round(float(row['Original_Price']), 2),
             'final_price': round(float(row['Final_Price']), 2),
@@ -486,37 +528,28 @@ def search_products():
 
 @app.route('/api/product/insights', methods=['POST'])
 def get_product_insights():
-    """Get detailed insights for a specific product"""
     data = request.json
     product_name = data.get('product_name', '').strip()
-    
     if not product_name:
         return jsonify({'success': False, 'message': 'Product name is required'}), 400
     
-    # Try exact match first
-    product_match = df_clean[df_clean['product_name'] == product_name]
-    
-    # If no exact match, try partial match
+    product_match = df_clean[df_clean['product_name'].astype(str) == product_name]
     if len(product_match) == 0:
         product_match = df_clean[
-            df_clean['product_name'].str.lower().str.contains(
-                product_name.lower(), na=False, regex=False
-            )
+            df_clean['product_name'].astype(str).str.lower().str.contains(product_name.lower(), na=False, regex=False)
         ]
-    
     if len(product_match) == 0:
         return jsonify({'success': False, 'message': 'Product not found'}), 404
     
     product = product_match.iloc[0]
     category = product['Category']
-    
     category_products = df_clean[df_clean['Category'] == category]
-    
     avg_category_price = category_products['Final_Price'].mean()
     product_price = float(product['Final_Price'])
     price_comparison = ((product_price - avg_category_price) / avg_category_price * 100)
     
-    # Get ML prediction
+    display_name = get_product_name(product, 0)
+    
     try:
         prediction = predict_optimal_price(
             category=product['Category'],
@@ -530,39 +563,37 @@ def get_product_insights():
     except Exception as e:
         prediction = {'error': str(e)}
     
-    # Find similar products
     price_range = 0.3
     min_price = product_price * (1 - price_range)
     max_price = product_price * (1 + price_range)
-    
     similar_products = category_products[
         (category_products['Final_Price'] >= min_price) &
         (category_products['Final_Price'] <= max_price) &
         (category_products['product_name'] != product['product_name'])
-    ].nlargest(5, 'Rating')
+    ].nlargest(5, 'Rating').reset_index(drop=True)
     
     similar_list = []
-    for _, sim in similar_products.iterrows():
+    for idx, sim in similar_products.iterrows():
+        sim_name = get_product_name(sim, idx)
         similar_list.append({
-            'name': str(sim['product_name'])[:60],
+            'name': sim_name[:60],
             'vendor': sim['vendors'],
             'price': round(float(sim['Final_Price']), 2),
             'rating': round(float(sim['Rating']), 2),
             'discount': round(float(sim['Discount_Percentage']), 2)
         })
     
-    # Determine action based on ML prediction
     current_price = product_price
     if 'predicted_price' in prediction:
         optimal_price = prediction['predicted_price']
         if optimal_price < current_price * 0.95:
             action = 'DECREASE'
             impact = round((current_price - optimal_price) / current_price * 100, 2)
-            action_message = f'<i class="fas fa-arrow-down text-red-500 mr-2"></i>Reduce price by {impact}% to boost sales'
+            action_message = f'<i class="fas fa-arrow-down text-red-500 mr-2"></i>Reduce price by {impact}%'
         elif optimal_price > current_price * 1.05:
             action = 'INCREASE'
             impact = round((optimal_price - current_price) / current_price * 100, 2)
-            action_message = f'<i class="fas fa-arrow-up text-teal-500 mr-2"></i>Can increase price by {impact}% (demand is high)'
+            action_message = f'<i class="fas fa-arrow-up text-teal-500 mr-2"></i>Can increase price by {impact}%'
         else:
             action = 'MAINTAIN'
             impact = 0
@@ -578,7 +609,7 @@ def get_product_insights():
     return jsonify({
         'success': True,
         'product': {
-            'name': str(product['product_name']),
+            'name': display_name,
             'category': product['Category'],
             'vendor': product['vendors'],
             'original_price': round(float(product['Original_Price']), 2),
@@ -610,40 +641,116 @@ def get_product_insights():
         },
         'similar_products': similar_list,
         'insights': [
-            f'<i class="fas fa-chart-bar text-purple-500 mr-2"></i>This product is priced {abs(price_comparison):.1f}% {"above" if price_comparison > 0 else "below"} category average',
+            f'<i class="fas fa-chart-bar text-purple-500 mr-2"></i>Priced {abs(price_comparison):.1f}% {"above" if price_comparison > 0 else "below"} average',
             f'<i class="fas fa-store text-blue-500 mr-2"></i>Sold by: {product["vendors"]}',
-            f'<i class="fas fa-star text-yellow-500 mr-2"></i>Rating: {float(product["Rating"]):.2f}/5 ({"Excellent" if product["Rating"] > 4.5 else "Good" if product["Rating"] > 3.5 else "Average"})',
-            f'<i class="fas fa-comment-dots text-pink-500 mr-2"></i>Customer sentiment: {product["Sentiment_Label"]} ({float(product["Sentiment_Polarity"]):.2f})',
-            f'<i class="fas fa-robot text-indigo-500 mr-2"></i>ML Recommendation: {action_message}',
-            f'<i class="fas fa-trophy text-amber-500 mr-2"></i>Best vendor in this category: {best_vendor_in_cat} ({best_vendor_rating} stars)',
-            f'<i class="fas fa-layer-group text-teal-500 mr-2"></i>{len(similar_products)} similar products available in this category'
+            f'<i class="fas fa-star text-yellow-500 mr-2"></i>Rating: {float(product["Rating"]):.2f}/5',
+            f'<i class="fas fa-comment-dots text-pink-500 mr-2"></i>Sentiment: {product["Sentiment_Label"]}',
+            f'<i class="fas fa-robot text-indigo-500 mr-2"></i>ML: {action_message}',
+            f'<i class="fas fa-trophy text-amber-500 mr-2"></i>Best vendor: {best_vendor_in_cat}',
+            f'<i class="fas fa-layer-group text-teal-500 mr-2"></i>{len(similar_products)} similar products'
         ]
     })
 
 @app.route('/api/product/suggestions', methods=['GET'])
 def product_suggestions():
-    """Auto-complete suggestions for product search"""
     query = request.args.get('q', '').strip().lower()
-    
     if not query or len(query) < 2:
         return jsonify({'success': True, 'suggestions': []})
     
     matching = df_clean[
-        df_clean['product_name'].str.lower().str.contains(query, na=False, regex=False)
-    ].head(10)
+        df_clean['product_name'].astype(str).str.lower().str.contains(query, na=False, regex=False)
+    ].head(10).reset_index(drop=True)
     
     suggestions = []
     seen = set()
-    for _, row in matching.iterrows():
-        name = str(row['product_name'])[:60]
+    for idx, row in matching.iterrows():
+        name = get_product_name(row, idx)
         if name not in seen:
             seen.add(name)
-            suggestions.append({
-                'name': name,
-                'category': row['Category']
-            })
+            suggestions.append({'name': name[:60], 'category': row['Category']})
     
     return jsonify({'success': True, 'suggestions': suggestions})
+
+# ============================================================
+# REVIEW ENDPOINTS
+# ============================================================
+
+@app.route('/api/reviews/add', methods=['POST'])
+def add_review():
+    data = request.json
+    product_name = data.get('product_name', '').strip()
+    category = data.get('category', '').strip()
+    username = data.get('username', 'Anonymous').strip()
+    rating = int(data.get('rating', 5))
+    review_text = data.get('review_text', '').strip()
+    
+    if not product_name or not category or not review_text:
+        return jsonify({'success': False, 'message': 'All fields are required'}), 400
+    
+    if rating < 1 or rating > 5:
+        return jsonify({'success': False, 'message': 'Rating must be 1-5'}), 400
+    
+    review_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO reviews (product_name, category, username, rating, review_text, review_date)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (product_name, category, username, rating, review_text, review_date))
+        conn.commit()
+        review_id = cursor.lastrowid
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Review added successfully!',
+            'review_id': review_id
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/reviews/all', methods=['GET'])
+def get_all_reviews():
+    try:
+        limit = int(request.args.get('limit', 20))
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM reviews ORDER BY review_date DESC LIMIT ?', (limit,))
+        rows = cursor.fetchall()
+        conn.close()
+        
+        reviews = [dict(row) for row in rows]
+        return jsonify({'success': True, 'total': len(reviews), 'reviews': reviews})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e), 'reviews': []}), 500
+
+@app.route('/api/reviews/<product_name>', methods=['GET'])
+def get_product_reviews(product_name):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM reviews WHERE product_name = ? ORDER BY review_date DESC', (product_name,))
+        rows = cursor.fetchall()
+        conn.close()
+        
+        reviews = [dict(row) for row in rows]
+        return jsonify({'success': True, 'product_name': product_name, 'total': len(reviews), 'reviews': reviews})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e), 'reviews': []}), 500
+
+@app.route('/api/reviews/delete/<int:review_id>', methods=['DELETE'])
+def delete_review(review_id):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM reviews WHERE id = ?', (review_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Review deleted'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ============================================================
 # RUN SERVER
@@ -652,6 +759,5 @@ def product_suggestions():
 if __name__ == '__main__':
     print("\nStarting Flask server...")
     print("API will be available at: http://localhost:5000")
-    print("Frontend should point to: http://localhost:5000/api/*")
     print("\n" + "=" * 80)
     app.run(debug=True, host='0.0.0.0', port=5000)

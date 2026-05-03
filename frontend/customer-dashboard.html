@@ -6,6 +6,7 @@
   <title>T&A IntelliMart - Customer Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -16,7 +17,6 @@
       overflow-x: hidden;
     }
 
-    /* Header */
     .header {
       background: white;
       padding: 20px 60px;
@@ -89,7 +89,6 @@
 
     .header-actions { display: flex; align-items: center; gap: 15px; }
 
-    /* Navigation */
     .nav-bar {
       background: white;
       padding: 12px 60px;
@@ -130,10 +129,8 @@
     .nav-item.active { color: #ec4899; background: rgba(236, 72, 153, 0.1); }
     .nav-item i { margin-right: 8px; }
 
-    /* Main Content */
     .main-content { padding: 40px 60px; max-width: 1400px; margin: 0 auto; }
 
-    /* Hero */
     .hero-section {
       background: white;
       border-radius: 30px;
@@ -261,7 +258,6 @@
     .floating-card i { font-size: 1.3rem; color: #ec4899; }
     .floating-card span { font-weight: 600; color: #831843; font-size: 0.85rem; }
 
-    /* Sections */
     .section {
       background: white;
       border-radius: 30px;
@@ -281,7 +277,6 @@
 
     .section-subtitle { font-size: 1rem; color: #be185d; max-width: 600px; margin: 0 auto; }
 
-    /* About Us */
     .about-content { display: flex; gap: 50px; align-items: center; }
     .about-text { flex: 1; }
     .about-text p { font-size: 1.1rem; color: #831843; line-height: 2; margin-bottom: 25px; }
@@ -316,29 +311,20 @@
 
     .about-visual { flex: 1; display: flex; justify-content: center; align-items: center; }
 
-    /* ========== NEW GEN-Z AESTHETIC CARD ========== */
     .aesthetic-card {
-      width: 320px;
-      height: 400px;
+      width: 320px; height: 400px;
       background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f9a8d4 100%);
       border-radius: 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 30px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; padding: 30px;
       box-shadow: 0 25px 60px rgba(236, 72, 153, 0.3);
       overflow: hidden;
     }
 
     .aesthetic-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
+      content: ''; position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
       background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 40%);
       animation: shimmer 5s ease-in-out infinite;
     }
@@ -349,29 +335,19 @@
     }
 
     .aesthetic-card::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
+      content: ''; position: absolute;
+      width: 100%; height: 100%;
       border: 3px dashed rgba(255, 255, 255, 0.5);
       border-radius: 40px;
       animation: rotate 25s linear infinite;
     }
 
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     .shopping-scene {
-      position: relative;
-      width: 220px;
-      height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      z-index: 2;
+      position: relative; width: 220px; height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; z-index: 2;
     }
 
     .main-emoji {
@@ -386,8 +362,7 @@
     }
 
     .sparkle {
-      position: absolute;
-      font-size: 2rem;
+      position: absolute; font-size: 2rem;
       animation: sparkleFloat 3s ease-in-out infinite;
       filter: drop-shadow(0 5px 10px rgba(236, 72, 153, 0.3));
     }
@@ -405,12 +380,8 @@
     }
 
     .vibe-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      z-index: 2;
-      position: relative;
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; z-index: 2; position: relative;
     }
 
     .vibe-tag {
@@ -418,13 +389,11 @@
       background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(10px);
       border-radius: 50px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      font-size: 0.8rem; font-weight: 700;
       color: #ec4899;
       border: 2px solid rgba(236, 72, 153, 0.2);
       box-shadow: 0 6px 20px rgba(236, 72, 153, 0.25);
-      transition: all 0.3s ease;
-      cursor: pointer;
+      transition: all 0.3s ease; cursor: pointer;
     }
 
     .vibe-tag:hover {
@@ -433,8 +402,7 @@
       box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
     }
 
-    /* Category */
-    .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+    .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; margin-bottom: 30px; }
 
     .category-card {
       background: linear-gradient(135deg, #fdf2f8, #fce7f3);
@@ -444,12 +412,30 @@
       border: 2px solid transparent;
       transition: all 0.4s ease;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .category-card::after {
+      content: '→';
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 1.5rem;
+      color: #ec4899;
+      opacity: 0;
+      transition: all 0.3s ease;
     }
 
     .category-card:hover {
       border-color: #ec4899;
       transform: translateY(-10px);
       box-shadow: 0 20px 50px rgba(236, 72, 153, 0.25);
+    }
+
+    .category-card:hover::after {
+      opacity: 1;
+      transform: translateX(5px);
     }
 
     .category-icon {
@@ -465,7 +451,6 @@
     .category-name { font-size: 1.15rem; font-weight: 700; color: #831843; margin-bottom: 8px; }
     .category-count { font-size: 0.9rem; color: #be185d; }
 
-    /* Analysis */
     .analysis-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
 
     .analysis-card {
@@ -474,6 +459,8 @@
       border-radius: 22px;
       border: 2px solid #fce7f3;
       transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
 
     .analysis-card:hover { border-color: #ec4899; transform: translateY(-5px); }
@@ -493,19 +480,47 @@
       color: white; font-size: 1.1rem;
     }
 
-    .analysis-chart {
-      height: 150px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-      padding: 10px 0;
+    .discount-note {
+      font-size: 0.75rem;
+      color: #be185d;
+      font-style: italic;
+      margin-top: 4px;
+      font-weight: 500;
     }
 
-    .chart-bar {
-      width: 40px;
-      background: linear-gradient(180deg, #ec4899, #db2777);
-      border-radius: 8px 8px 0 0;
-      transition: height 0.5s ease;
+    /* Interactive Price Chart Container */
+    #price-trends-chart {
+      width: 100%;
+      height: 280px;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+
+    .chart-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid #fce7f3;
+    }
+
+    .chart-stat {
+      text-align: center;
+    }
+
+    .chart-stat-value {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ec4899;
+    }
+
+    .chart-stat-label {
+      font-size: 0.75rem;
+      color: #831843;
+      font-weight: 600;
+      margin-top: 2px;
     }
 
     .price-trends { display: flex; flex-direction: column; gap: 15px; }
@@ -516,6 +531,13 @@
       background: white;
       border-radius: 12px;
       border: 2px solid #fce7f3;
+      transition: all 0.3s ease;
+    }
+
+    .trend-item:hover {
+      border-color: #ec4899;
+      transform: translateX(5px);
+      box-shadow: 0 10px 25px rgba(236, 72, 153, 0.15);
     }
 
     .trend-product { display: flex; align-items: center; gap: 12px; }
@@ -535,7 +557,59 @@
     .trend-change.up { background: #dcfce7; color: #166534; }
     .trend-change.down { background: #fee2e2; color: #991b1b; }
 
-    /* Review */
+    .review-form-container {
+      background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+      padding: 30px;
+      border-radius: 22px;
+      border: 2px solid #fce7f3;
+      margin-bottom: 30px;
+    }
+
+    .review-form-title {
+      font-size: 1.3rem; font-weight: 700; color: #831843;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .review-form { display: flex; flex-direction: column; gap: 15px; }
+
+    .review-form input, .review-form select, .review-form textarea {
+      padding: 12px 16px;
+      border: 2px solid #fce7f3;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      background: white;
+      color: #831843;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .review-form input:focus, .review-form select:focus, .review-form textarea:focus {
+      border-color: #ec4899;
+    }
+
+    .review-form textarea { min-height: 100px; resize: vertical; }
+
+    .review-form button {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+      align-self: flex-start;
+    }
+
+    .review-form button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4);
+    }
+
     .review-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
 
     .review-card {
@@ -575,7 +649,13 @@
     .review-product i { color: #ec4899; }
     .review-product span { font-size: 0.9rem; color: #be185d; }
 
-    /* Footer */
+    .review-date {
+      font-size: 0.75rem;
+      color: #be185d;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
     .footer {
       background: white;
       padding: 30px 60px;
@@ -613,7 +693,6 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="header-logo">
       <div class="logo-icon"><i class="fas fa-shopping-bag"></i></div>
@@ -630,7 +709,6 @@
     </div>
   </header>
 
-  <!-- Navigation -->
   <nav class="nav-bar">
     <div class="nav-item active" onclick="showSection('home', this)">
       <i class="fas fa-home"></i> Home
@@ -649,22 +727,24 @@
     </div>
   </nav>
 
-  <!-- Main Content -->
   <main class="main-content">
-    <!-- Hero -->
     <section class="hero-section" id="home-section">
       <div class="hero-content">
-        <span class="hero-badge"><i class="fas fa-sparkles"></i> Smart Shopping Platform</span>
-        <h1 class="hero-title">Discover the Best <span>Deals</span> with Smart Analysis</h1>
+        <span class="hero-badge">
+          <i class="fas fa-brain"></i> Smart Pricing Platform
+        </span>
+        <h1 class="hero-title">
+          Discover the Best <span>Pricing</span> with Smart Analysis
+        </h1>
         <p class="hero-description">
-          We analyze thousands of products and reviews to bring you the best prices and personalized recommendations. Shop smarter with T&A IntelliMart.
+          We analyze thousands of products and reviews to bring you optimal prices and personalized recommendations. Price smarter with T&A IntelliMart.
         </p>
         <div class="hero-buttons">
           <button class="btn-primary" onclick="showSection('category', document.querySelectorAll('.nav-item')[2])">
-            <i class="fas fa-shopping-cart"></i> Start Shopping
+            <i class="fas fa-chart-line"></i> Start Analysis
           </button>
           <button class="btn-secondary" onclick="showSection('analysis', document.querySelectorAll('.nav-item')[3])">
-            <i class="fas fa-chart-bar"></i> View Analysis
+            <i class="fas fa-chart-bar"></i> View Insights
           </button>
         </div>
       </div>
@@ -677,7 +757,6 @@
       </div>
     </section>
 
-    <!-- About Us -->
     <section class="section" id="about-section">
       <div class="section-header">
         <h2 class="section-title">About Us</h2>
@@ -710,7 +789,6 @@
           </div>
         </div>
         <div class="about-visual">
-          <!-- 🎨 NEW AESTHETIC GEN-Z SHOPPING CARD -->
           <div class="aesthetic-card">
             <div class="shopping-scene">
               <div class="main-emoji">🛍️</div>
@@ -731,57 +809,55 @@
       </div>
     </section>
 
-    <!-- Category -->
     <section class="section" id="category-section">
       <div class="section-header">
         <h2 class="section-title">Shop by Category</h2>
-        <p class="section-subtitle">Browse our wide range of product categories</p>
+        <p class="section-subtitle">Click any category to explore products</p>
       </div>
       <div class="category-grid">
-        <div class="category-card" onclick="alert('Electronics products will be shown here')">
+        <div class="category-card" onclick="loadProducts('Electronics')">
           <div class="category-icon"><i class="fas fa-mobile-alt"></i></div>
           <h3 class="category-name">Electronics</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-Electronics">Loading...</p>
         </div>
-        <div class="category-card" onclick="alert('Grocery products will be shown here')">
+        <div class="category-card" onclick="loadProducts('Grocery')">
           <div class="category-icon"><i class="fas fa-shopping-basket"></i></div>
           <h3 class="category-name">Grocery</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-Grocery">Loading...</p>
         </div>
-        <div class="category-card" onclick="alert('Snacks products will be shown here')">
+        <div class="category-card" onclick="loadProducts('Snacks')">
           <div class="category-icon"><i class="fas fa-cookie-bite"></i></div>
           <h3 class="category-name">Snacks</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-Snacks">Loading...</p>
         </div>
-        <div class="category-card" onclick="alert('Beverages products will be shown here')">
+        <div class="category-card" onclick="loadProducts('Beverages')">
           <div class="category-icon"><i class="fas fa-coffee"></i></div>
           <h3 class="category-name">Beverages</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-Beverages">Loading...</p>
         </div>
-        <div class="category-card" onclick="alert('Fruits & Vegetables will be shown here')">
+        <div class="category-card" onclick="loadProducts('Fruits & Vegetables')">
           <div class="category-icon"><i class="fas fa-apple-alt"></i></div>
           <h3 class="category-name">Fruits & Vegetables</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-FruitsVegetables">Loading...</p>
         </div>
-        <div class="category-card" onclick="alert('Fashion products will be shown here')">
+        <div class="category-card" onclick="loadProducts('Fashion')">
           <div class="category-icon"><i class="fas fa-tshirt"></i></div>
           <h3 class="category-name">Fashion</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-Fashion">Loading...</p>
         </div>
-        <div class="category-card" onclick="alert('Home products will be shown here')">
+        <div class="category-card" onclick="loadProducts('Home & Living')">
           <div class="category-icon"><i class="fas fa-home"></i></div>
           <h3 class="category-name">Home & Living</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-HomeLiving">Loading...</p>
         </div>
-        <div class="category-card" onclick="alert('Beauty products will be shown here')">
+        <div class="category-card" onclick="loadProducts('Beauty')">
           <div class="category-icon"><i class="fas fa-spa"></i></div>
           <h3 class="category-name">Beauty</h3>
-          <p class="category-count">Loading...</p>
+          <p class="category-count" id="count-Beauty">Loading...</p>
         </div>
       </div>
     </section>
 
-    <!-- Analysis -->
     <section class="section" id="analysis-section">
       <div class="section-header">
         <h2 class="section-title">Price Analysis</h2>
@@ -790,48 +866,47 @@
       <div class="analysis-container">
         <div class="analysis-card">
           <div class="analysis-header">
-            <h3 class="analysis-title">Price Trends</h3>
+            <div>
+              <h3 class="analysis-title">📈 Category Price Trends</h3>
+              <p class="discount-note">* Hover to explore average prices</p>
+            </div>
             <div class="analysis-icon"><i class="fas fa-chart-line"></i></div>
           </div>
-          <div class="analysis-chart">
-            <div class="chart-bar" style="height: 60px;"></div>
-            <div class="chart-bar" style="height: 90px;"></div>
-            <div class="chart-bar" style="height: 75px;"></div>
-            <div class="chart-bar" style="height: 120px;"></div>
-            <div class="chart-bar" style="height: 100px;"></div>
-            <div class="chart-bar" style="height: 85px;"></div>
-            <div class="chart-bar" style="height: 110px;"></div>
+          <div id="price-trends-chart"></div>
+          <div class="chart-stats">
+            <div class="chart-stat">
+              <div class="chart-stat-value" id="avg-market-price">₹--</div>
+              <div class="chart-stat-label">Avg Price</div>
+            </div>
+            <div class="chart-stat">
+              <div class="chart-stat-value" id="highest-price">₹--</div>
+              <div class="chart-stat-label">Highest</div>
+            </div>
+            <div class="chart-stat">
+              <div class="chart-stat-value" id="lowest-price">₹--</div>
+              <div class="chart-stat-label">Lowest</div>
+            </div>
           </div>
         </div>
+
         <div class="analysis-card">
           <div class="analysis-header">
-            <h3 class="analysis-title">Top Price Drops</h3>
+            <div>
+              <h3 class="analysis-title">Top Price Drops</h3>
+              <p class="discount-note">* Maximum discount by category</p>
+            </div>
             <div class="analysis-icon"><i class="fas fa-arrow-down"></i></div>
           </div>
-          <div class="price-trends">
+          <div class="price-trends" id="top-price-drops">
             <div class="trend-item">
               <div class="trend-product">
-                <div class="trend-icon"><i class="fas fa-mobile-alt"></i></div>
-                <span class="trend-name">Electronics</span>
+                <div class="trend-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                <span class="trend-name">Loading...</span>
               </div>
-              <div><span class="trend-price">₹806</span><span class="trend-change down">-42%</span></div>
-            </div>
-            <div class="trend-item">
-              <div class="trend-product">
-                <div class="trend-icon"><i class="fas fa-shopping-basket"></i></div>
-                <span class="trend-name">Grocery</span>
-              </div>
-              <div><span class="trend-price">₹355</span><span class="trend-change down">-20%</span></div>
-            </div>
-            <div class="trend-item">
-              <div class="trend-product">
-                <div class="trend-icon"><i class="fas fa-cookie-bite"></i></div>
-                <span class="trend-name">Snacks</span>
-              </div>
-              <div><span class="trend-price">₹496</span><span class="trend-change down">-20%</span></div>
             </div>
           </div>
         </div>
+
         <div class="analysis-card">
           <div class="analysis-header">
             <h3 class="analysis-title">Market Statistics</h3>
@@ -843,14 +918,14 @@
                 <div class="trend-icon"><i class="fas fa-box"></i></div>
                 <span class="trend-name">Total Products</span>
               </div>
-              <span class="trend-price">2,00,000+</span>
+              <span class="trend-price" id="total-products-stat">Loading...</span>
             </div>
             <div class="trend-item">
               <div class="trend-product">
                 <div class="trend-icon"><i class="fas fa-store"></i></div>
                 <span class="trend-name">Active Vendors</span>
               </div>
-              <span class="trend-price">7</span>
+              <span class="trend-price" id="total-vendors-stat">7</span>
             </div>
             <div class="trend-item">
               <div class="trend-product">
@@ -861,6 +936,7 @@
             </div>
           </div>
         </div>
+
         <div class="analysis-card">
           <div class="analysis-header">
             <h3 class="analysis-title">Top Vendors</h3>
@@ -893,71 +969,60 @@
       </div>
     </section>
 
-    <!-- Review -->
     <section class="section" id="review-section">
       <div class="section-header">
         <h2 class="section-title">Customer Reviews</h2>
-        <p class="section-subtitle">See what our customers are saying</p>
+        <p class="section-subtitle">Share your experience and see what others are saying</p>
       </div>
-      <div class="review-container">
-        <div class="review-card">
-          <div class="review-header">
-            <div class="review-avatar">AK</div>
-            <div class="review-info"><h4>Amit Kumar</h4><span>Verified Buyer</span></div>
-          </div>
-          <div class="review-stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-          </div>
-          <p class="review-text">Amazing platform! The price analysis helped me save ₹5,000 on my purchase. Highly recommended!</p>
-          <div class="review-product"><i class="fas fa-laptop"></i><span>Electronics</span></div>
+
+      <div class="review-form-container">
+        <div class="review-form-title">
+          <i class="fas fa-pen"></i> Add Your Review
         </div>
-        <div class="review-card">
-          <div class="review-header">
-            <div class="review-avatar">PS</div>
-            <div class="review-info"><h4>Priya Sharma</h4><span>Verified Buyer</span></div>
-          </div>
-          <div class="review-stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-          </div>
-          <p class="review-text">Love the personalized recommendations! Found great items at unbelievable prices!</p>
-          <div class="review-product"><i class="fas fa-shopping-basket"></i><span>Grocery</span></div>
-        </div>
-        <div class="review-card">
-          <div class="review-header">
-            <div class="review-avatar">RS</div>
-            <div class="review-info"><h4>Rahul Singh</h4><span>Verified Buyer</span></div>
-          </div>
-          <div class="review-stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-          </div>
-          <p class="review-text">The review analysis feature is fantastic. It helped me choose the best product!</p>
-          <div class="review-product"><i class="fas fa-mobile-alt"></i><span>Electronics</span></div>
-        </div>
+        <form class="review-form" id="review-form" onsubmit="submitReview(event)">
+          <input type="text" id="review-product-name" placeholder="Product Name" required />
+          <select id="review-category" required>
+            <option value="">Select Category</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Grocery">Grocery</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Beverages">Beverages</option>
+            <option value="Fruits & Vegetables">Fruits & Vegetables</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Home & Living">Home & Living</option>
+            <option value="Beauty">Beauty</option>
+          </select>
+          <select id="review-rating" required>
+            <option value="">Select Rating</option>
+            <option value="5">5 Stars - Excellent</option>
+            <option value="4">4 Stars - Good</option>
+            <option value="3">3 Stars - Average</option>
+            <option value="2">2 Stars - Poor</option>
+            <option value="1">1 Star - Terrible</option>
+          </select>
+          <textarea id="review-text" placeholder="Write your review here..." required></textarea>
+          <button type="submit"><i class="fas fa-paper-plane"></i> Submit Review</button>
+        </form>
       </div>
+
+      <div class="review-container" id="reviews-list"></div>
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
       <i class="fas fa-copyright"></i>
-      <span>2024 T&A IntelliMart. All rights reserved. Smart Shopping Made Simple.</span>
+      <span>2026 T&A IntelliMart. All rights reserved. Smart Shopping Made Simple.</span>
     </div>
   </footer>
 
   <script>
-    // Check if user is logged in
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username') || localStorage.getItem('username');
+    const API_URL = 'http://localhost:5000/api';
     
-    if (!username) {
-      alert('⚠️ Please login first!');
-      window.location.href = 'login.html';
-    } else {
-      document.getElementById('userName').textContent = username;
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username') || localStorage.getItem('username') || 'Customer';
+    document.getElementById('userName').textContent = username;
 
-    // Show specific section
     function showSection(sectionName, clickedElement) {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.querySelector('.hero-section').style.display = 'none';
@@ -971,19 +1036,319 @@
       }
 
       if (clickedElement) clickedElement.classList.add('active');
+
+      if (sectionName === 'category') updateCategoryCounts();
+      if (sectionName === 'review') loadReviews();
+      if (sectionName === 'analysis') {
+        loadStats();
+        loadTopPriceDrops();
+        loadPriceTrendsChart();
+      }
     }
 
-    // Logout function
     function logout() {
       if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('username');
-        localStorage.removeItem('userType');
+        localStorage.clear();
         window.location.href = 'login.html';
       }
     }
 
-    // Initialize - show home section
+    async function updateCategoryCounts() {
+      try {
+        const response = await fetch(`${API_URL}/categories`);
+        const data = await response.json();
+        if (data.success) {
+          data.categories.forEach(cat => {
+            const id = 'count-' + cat.name.replace(/ & /g, '').replace(/\s/g, '');
+            const el = document.getElementById(id);
+            if (el) el.textContent = `${cat.count.toLocaleString()} products`;
+          });
+        }
+      } catch (err) {
+        console.error('Error loading categories:', err);
+      }
+    }
+
+    async function loadStats() {
+      try {
+        const response = await fetch(`${API_URL}/stats`);
+        const data = await response.json();
+        if (data.success) {
+          document.getElementById('total-products-stat').textContent = data.total_products.toLocaleString() + '+';
+          document.getElementById('total-vendors-stat').textContent = data.total_vendors;
+        }
+      } catch (err) {
+        console.error('Error loading stats:', err);
+      }
+    }
+
+    // ============================================================
+    // ✨ ONLY CHANGE: Chart with Outlier Capping ✨
+    // ============================================================
+    async function loadPriceTrendsChart() {
+      const categories = ['Electronics', 'Grocery', 'Snacks', 'Beverages', 'Fruits & Vegetables', 'Fashion', 'Home & Living', 'Beauty'];
+      const avgPrices = [];
+      const categoryNames = [];
+      
+      for (const cat of categories) {
+        try {
+          const response = await fetch(`${API_URL}/products/${encodeURIComponent(cat)}`);
+          const data = await response.json();
+          if (data.success && data.products && data.products.length > 0) {
+            const avg = data.products.reduce((sum, p) => sum + p.final_price, 0) / data.products.length;
+            avgPrices.push(Math.round(avg));
+            categoryNames.push(cat);
+          }
+        } catch (err) {
+          console.error(`Error loading ${cat}:`, err);
+        }
+      }
+
+      if (avgPrices.length > 0) {
+        const overallAvg = Math.round(avgPrices.reduce((a, b) => a + b, 0) / avgPrices.length);
+        const highest = Math.max(...avgPrices);
+        const lowest = Math.min(...avgPrices);
+        document.getElementById('avg-market-price').textContent = `₹${overallAvg.toLocaleString()}`;
+        document.getElementById('highest-price').textContent = `₹${highest.toLocaleString()}`;
+        document.getElementById('lowest-price').textContent = `₹${lowest.toLocaleString()}`;
+      }
+
+      // 🔥 CAP OUTLIERS: Cap at 2.5x median for balanced visualization
+      const sortedPrices = [...avgPrices].sort((a, b) => a - b);
+      const median = sortedPrices[Math.floor(sortedPrices.length / 2)];
+      const cap = median * 2.5;
+      const displayPrices = avgPrices.map(p => Math.min(p, cap));
+      const originalPrices = [...avgPrices];
+      const isCapped = avgPrices.map(p => p > cap);
+
+      const trace = {
+        x: categoryNames,
+        y: displayPrices,
+        type: 'bar',
+        marker: {
+          color: originalPrices,
+          colorscale: [
+            [0, '#fce7f3'],
+            [0.3, '#f9a8d4'],
+            [0.6, '#ec4899'],
+            [1, '#be185d']
+          ],
+          line: {
+            color: '#ec4899',
+            width: 2
+          },
+          opacity: 0.9
+        },
+        text: originalPrices.map((p, i) => isCapped[i] ? `₹${p.toLocaleString()}⚡` : `₹${p.toLocaleString()}`),
+        textposition: 'outside',
+        textfont: {
+          family: 'Poppins',
+          size: 11,
+          color: '#831843'
+        },
+        customdata: originalPrices,
+        hovertemplate: '<b>%{x}</b><br>Actual Price: ₹%{customdata:,}<br><extra></extra>',
+        hoverlabel: {
+          bgcolor: '#ec4899',
+          bordercolor: '#be185d',
+          font: { color: 'white', family: 'Poppins', size: 14 }
+        }
+      };
+
+      const layout = {
+        margin: { t: 30, b: 80, l: 50, r: 20 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: 'Poppins', color: '#831843' },
+        xaxis: {
+          tickfont: { size: 10, color: '#831843' },
+          tickangle: -30,
+          gridcolor: 'rgba(236, 72, 153, 0.1)',
+          linecolor: 'rgba(236, 72, 153, 0.3)',
+          showgrid: false
+        },
+        yaxis: {
+          tickfont: { size: 10, color: '#831843' },
+          tickprefix: '₹',
+          gridcolor: 'rgba(236, 72, 153, 0.1)',
+          linecolor: 'rgba(236, 72, 153, 0.3)',
+          zerolinecolor: 'rgba(236, 72, 153, 0.2)',
+          range: [0, cap * 1.3]
+        },
+        showlegend: false,
+        bargap: 0.3,
+        annotations: isCapped.some(c => c) ? [{
+          x: 0.5, y: 1.08,
+          xref: 'paper', yref: 'paper',
+          text: '⚡ = Outlier (actual price in label & hover)',
+          showarrow: false,
+          font: { size: 10, color: '#be185d', family: 'Poppins' }
+        }] : []
+      };
+
+      const config = {
+        responsive: true,
+        displayModeBar: false,
+        staticPlot: false
+      };
+
+      Plotly.newPlot('price-trends-chart', [trace], layout, config);
+
+      document.getElementById('price-trends-chart').on('plotly_click', function(data) {
+        const category = data.points[0].x;
+        if (confirm(`View ${category} products?`)) {
+          loadProducts(category);
+        }
+      });
+    }
+
+    async function loadTopPriceDrops() {
+      const container = document.getElementById('top-price-drops');
+      if (!container) return;
+      
+      const categories = [
+        { name: 'Electronics', icon: 'fas fa-mobile-alt' },
+        { name: 'Grocery', icon: 'fas fa-shopping-basket' },
+        { name: 'Snacks', icon: 'fas fa-cookie-bite' },
+        { name: 'Beverages', icon: 'fas fa-coffee' },
+        { name: 'Fashion', icon: 'fas fa-tshirt' }
+      ];
+      
+      container.innerHTML = '';
+      
+      for (const cat of categories) {
+        try {
+          const response = await fetch(`${API_URL}/products/${encodeURIComponent(cat.name)}`);
+          const data = await response.json();
+          
+          if (data.success && data.products && data.products.length > 0) {
+            const topProduct = data.products.reduce((max, p) => p.discount > max.discount ? p : max, data.products[0]);
+            
+            const item = document.createElement('div');
+            item.className = 'trend-item';
+            item.innerHTML = `
+              <div class="trend-product">
+                <div class="trend-icon"><i class="${cat.icon}"></i></div>
+                <span class="trend-name">${cat.name}</span>
+              </div>
+              <div>
+                <span class="trend-price">₹${Math.round(topProduct.final_price).toLocaleString()}</span>
+                <span class="trend-change down">-${topProduct.discount.toFixed(0)}%</span>
+              </div>
+            `;
+            container.appendChild(item);
+          }
+        } catch (err) {
+          console.error(`Error loading ${cat.name}:`, err);
+        }
+      }
+    }
+
+    function loadProducts(category) {
+      window.location.href = `category-products.html?category=${encodeURIComponent(category)}&username=${encodeURIComponent(username)}`;
+    }
+
+    async function submitReview(event) {
+      event.preventDefault();
+      const product_name = document.getElementById('review-product-name').value;
+      const category = document.getElementById('review-category').value;
+      const rating = parseInt(document.getElementById('review-rating').value);
+      const review_text = document.getElementById('review-text').value;
+
+      try {
+        const response = await fetch(`${API_URL}/reviews/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_name, category, username, rating, review_text })
+        });
+        const data = await response.json();
+        if (data.success) {
+          alert('Review submitted successfully!');
+          document.getElementById('review-form').reset();
+          loadReviews();
+        } else {
+          alert('Failed to submit review: ' + data.message);
+        }
+      } catch (err) {
+        alert('Error submitting review: ' + err.message);
+      }
+    }
+
+    async function loadReviews() {
+      const container = document.getElementById('reviews-list');
+      container.innerHTML = '<p style="text-align:center; color:#be185d; padding:20px; grid-column: 1 / -1;">Loading reviews...</p>';
+
+      try {
+        const response = await fetch(`${API_URL}/reviews/all`);
+        const data = await response.json();
+        container.innerHTML = '';
+        
+        if (!data.success || !data.reviews || data.reviews.length === 0) {
+          container.innerHTML = `
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">AK</div>
+                <div class="review-info"><h4>Amit Kumar</h4><span>Verified Buyer</span></div>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <p class="review-text">Amazing platform! The price analysis helped me save ₹5,000 on my purchase!</p>
+              <div class="review-product"><i class="fas fa-laptop"></i><span>Electronics</span></div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">PS</div>
+                <div class="review-info"><h4>Priya Sharma</h4><span>Verified Buyer</span></div>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+              </div>
+              <p class="review-text">Love the personalized recommendations! Found great items at unbelievable prices!</p>
+              <div class="review-product"><i class="fas fa-shopping-basket"></i><span>Grocery</span></div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">RS</div>
+                <div class="review-info"><h4>Rahul Singh</h4><span>Verified Buyer</span></div>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <p class="review-text">The review analysis feature is fantastic!</p>
+              <div class="review-product"><i class="fas fa-mobile-alt"></i><span>Electronics</span></div>
+            </div>
+          `;
+          return;
+        }
+
+        data.reviews.forEach(review => {
+          const initials = review.username.substring(0, 2).toUpperCase();
+          const stars = '<i class="fas fa-star"></i>'.repeat(review.rating) + '<i class="far fa-star"></i>'.repeat(5 - review.rating);
+          const date = new Date(review.review_date).toLocaleDateString();
+          
+          const card = document.createElement('div');
+          card.className = 'review-card';
+          card.innerHTML = `
+            <div class="review-header">
+              <div class="review-avatar">${initials}</div>
+              <div class="review-info"><h4>${review.username}</h4><span>Verified Buyer</span></div>
+            </div>
+            <div class="review-stars">${stars}</div>
+            <p class="review-text">${review.review_text}</p>
+            <div class="review-product"><i class="fas fa-tag"></i><span>${review.product_name} • ${review.category}</span></div>
+            <p class="review-date"><i class="fas fa-clock"></i> ${date}</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        container.innerHTML = `<p style="text-align:center; color:#be185d; grid-column: 1 / -1;">Error loading reviews</p>`;
+      }
+    }
+
     document.querySelector('.hero-section').style.display = 'flex';
+    updateCategoryCounts();
+    loadStats();
   </script>
 </body>
 </html>

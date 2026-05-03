@@ -297,6 +297,7 @@ This system helps:
 
 **👥 Team**
 
+
 | Developer | Role | GitHub |
 | --- | --- | --- |
 | Tanisha Khare | Developer | @aniruddh25pandey |
@@ -357,6 +358,8 @@ This project is developed for **educational and portfolio purposes**.
 **📧 Contact**
 
 For queries or collaborations:
+
+
 
 | Contact | Details |
 | --- | --- |

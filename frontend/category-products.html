@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T&A IntelliMart - Products</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fdf2f8 0%, #fbcfe8 50%, #f9a8d4 100%);
+      min-height: 100vh;
+    }
+
+    .header {
+      background: white;
+      padding: 20px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(236, 72, 153, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo { display: flex; align-items: center; gap: 15px; }
+
+    .logo-icon {
+      width: 45px; height: 45px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.3rem;
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+    }
+
+    .logo-text {
+      font-size: 1.6rem; font-weight: 800;
+      background: linear-gradient(135deg, #ec4899, #db2777, #be185d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .back-btn {
+      padding: 10px 20px;
+      background: white;
+      color: #ec4899;
+      border: 2px solid #ec4899;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-btn:hover {
+      background: #ec4899;
+      color: white;
+    }
+
+    .category-hero {
+      background: white;
+      border-radius: 30px;
+      padding: 40px;
+      margin: 30px 60px;
+      box-shadow: 0 10px 40px rgba(236, 72, 153, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .category-hero-info h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #831843;
+      margin-bottom: 10px;
+    }
+
+    .category-hero-info h1 span {
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .category-hero-info p {
+      color: #be185d;
+      font-size: 1.1rem;
+    }
+
+    .category-hero-icon {
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 3.5rem;
+      box-shadow: 0 15px 40px rgba(236, 72, 153, 0.3);
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 20px;
+      margin: 30px 60px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .stat-icon {
+      width: 50px; height: 50px;
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ec4899;
+      font-size: 1.5rem;
+    }
+
+    .stat-info h3 { color: #831843; font-size: 1.5rem; font-weight: 700; }
+    .stat-info p { color: #be185d; font-size: 0.85rem; }
+
+    .products-container {
+      padding: 30px 60px;
+    }
+
+    .products-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #831843;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.1);
+      border: 2px solid transparent;
+      transition: all 0.4s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card:hover {
+      transform: translateY(-10px);
+      border-color: #ec4899;
+      box-shadow: 0 25px 60px rgba(236, 72, 153, 0.25);
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .discount-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 5px 15px rgba(236, 72, 153, 0.3);
+    }
+
+    .product-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #831843;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      padding-right: 70px;
+    }
+
+    .product-vendor {
+      display: inline-block;
+      padding: 4px 12px;
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      color: #ec4899;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .product-prices {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .final-price {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ec4899;
+    }
+
+    .original-price {
+      font-size: 1rem;
+      color: #be185d;
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 15px;
+      color: #fbbf24;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .product-rating .rating-num {
+      color: #831843;
+      background: #fef3c7;
+      padding: 3px 10px;
+      border-radius: 10px;
+    }
+
+    .product-rating .review-count {
+      color: #be185d;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .view-btn {
+      flex: 1;
+      padding: 10px;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .view-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #be185d;
+      font-size: 1.2rem;
+    }
+
+    .loading i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #ec4899;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(131, 24, 67, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: white;
+      border-radius: 25px;
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 80px rgba(131, 24, 67, 0.3);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      width: 40px; height: 40px;
+      background: #fce7f3;
+      color: #ec4899;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .modal-close:hover { background: #ec4899; color: white; }
+
+    .modal-header {
+      border-bottom: 2px solid #fce7f3;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      color: #831843;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .modal-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #fce7f3;
+    }
+
+    .modal-detail span:first-child { color: #be185d; font-weight: 600; }
+    .modal-detail span:last-child { color: #831843; font-weight: 700; }
+
+    @media (max-width: 768px) {
+      .header, .category-hero, .stats-bar, .products-container { 
+        padding-left: 20px; padding-right: 20px; margin-left: 0; margin-right: 0; 
+      }
+      .stats-bar { flex-direction: column; }
+      .products-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-logo">
+      <div class="logo-icon"><i class="fas fa-shopping-bag"></i></div>
+      <span class="logo-text">T&A IntelliMart</span>
+    </div>
+    <a href="customer-dashboard.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </header>
+
+  <section class="category-hero">
+    <div class="category-hero-info">
+      <h1>Shop <span id="category-name">Category</span></h1>
+      <p id="category-description">Explore the best products in this category</p>
+    </div>
+    <div class="category-hero-icon">
+      <i id="category-icon" class="fas fa-shopping-basket"></i>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-box"></i></div>
+      <div class="stat-info">
+        <h3 id="total-count">0</h3>
+        <p>Total Products</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
+      <div class="stat-info">
+        <h3 id="avg-price">₹0</h3>
+        <p>Average Price</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-tag"></i></div>
+      <div class="stat-info">
+        <h3 id="avg-discount">0%</h3>
+        <p>Average Discount</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-star"></i></div>
+      <div class="stat-info">
+        <h3 id="avg-rating">0</h3>
+        <p>Average Rating</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="products-container">
+    <h2 class="products-title">
+      <i class="fas fa-th-large"></i>
+      <span id="products-title-text">Loading Products...</span>
+    </h2>
+    <div class="products-grid" id="products-grid">
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading amazing products for you...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Details Modal -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal-content" id="modal-content-inner"></div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    
+    // Get category from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category') || 'Electronics';
+    
+    // Category icons mapping
+    const categoryIcons = {
+      'Electronics': 'fas fa-mobile-alt',
+      'Grocery': 'fas fa-shopping-basket',
+      'Snacks': 'fas fa-cookie-bite',
+      'Beverages': 'fas fa-coffee',
+      'Fruits & Vegetables': 'fas fa-apple-alt',
+      'Fashion': 'fas fa-tshirt',
+      'Home & Living': 'fas fa-home',
+      'Beauty': 'fas fa-spa',
+      'Books': 'fas fa-book',
+      'Clothing': 'fas fa-tshirt'
+    };
+
+    // Set category info
+    document.getElementById('category-name').textContent = category;
+    document.getElementById('category-icon').className = categoryIcons[category] || 'fas fa-shopping-bag';
+    document.getElementById('products-title-text').textContent = `${category} Products`;
+    document.title = `${category} - T&A IntelliMart`;
+
+    // Load products
+    async function loadProducts() {
+      const grid = document.getElementById('products-grid');
+      
+      try {
+        const response = await fetch(`${API_URL}/products/${encodeURIComponent(category)}`);
+        if (!response.ok) throw new Error('Failed to load');
+        
+        const data = await response.json();
+        if (!data.success || !data.products || data.products.length === 0) {
+          grid.innerHTML = '<div class="loading"><i class="fas fa-box-open"></i><p>No products found</p></div>';
+          return;
+        }
+
+        // Calculate stats
+        const totalCount = data.total_products;
+        const avgPrice = data.products.reduce((sum, p) => sum + p.final_price, 0) / data.products.length;
+        const avgDiscount = data.products.reduce((sum, p) => sum + p.discount, 0) / data.products.length;
+        const avgRating = data.products.reduce((sum, p) => sum + p.rating, 0) / data.products.length;
+
+        document.getElementById('total-count').textContent = totalCount.toLocaleString();
+        document.getElementById('avg-price').textContent = '₹' + Math.round(avgPrice).toLocaleString();
+        document.getElementById('avg-discount').textContent = avgDiscount.toFixed(1) + '%';
+        document.getElementById('avg-rating').textContent = avgRating.toFixed(1) + '⭐';
+
+        // Render products
+        grid.innerHTML = '';
+        data.products.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            ${product.discount > 0 ? `<div class="discount-badge">${product.discount}% OFF</div>` : ''}
+            <h3 class="product-name">${product.name}</h3>
+            <span class="product-vendor"><i class="fas fa-store"></i> ${product.vendor}</span>
+            <div class="product-prices">
+              <span class="final-price">₹${product.final_price.toLocaleString()}</span>
+              ${product.original_price > product.final_price ? 
+                `<span class="original-price">₹${product.original_price.toLocaleString()}</span>` : ''}
+            </div>
+            <div class="product-rating">
+              <span class="rating-num">${product.rating} ⭐</span>
+              <span class="review-count">(${product.reviews} reviews)</span>
+            </div>
+            <div class="product-actions">
+              <button class="view-btn" onclick='showProductDetails(${JSON.stringify(product).replace(/'/g, "&apos;")})'>
+                <i class="fas fa-eye"></i> View Details
+              </button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      } catch (error) {
+        grid.innerHTML = `<div class="loading"><i class="fas fa-exclamation-triangle"></i><p>Error: ${error.message}</p></div>`;
+      }
+    }
+
+    // Show product details modal
+    function showProductDetails(product) {
+      const modal = document.getElementById('product-modal');
+      const content = document.getElementById('modal-content-inner');
+      
+      const savings = product.original_price - product.final_price;
+      
+      content.innerHTML = `
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div class="modal-header">
+          <h2>${product.name}</h2>
+          <span class="product-vendor"><i class="fas fa-store"></i> ${product.vendor}</span>
+        </div>
+        <div class="modal-detail">
+          <span>📁 Category</span>
+          <span>${product.category}</span>
+        </div>
+        <div class="modal-detail">
+          <span>💰 Original Price</span>
+          <span>₹${product.original_price.toLocaleString()}</span>
+        </div>
+        <div class="modal-detail">
+          <span>🏷️ Final Price</span>
+          <span style="color: #ec4899; font-size: 1.3rem;">₹${product.final_price.toLocaleString()}</span>
+        </div>
+        <div class="modal-detail">
+          <span>💸 Discount</span>
+          <span style="color: #10b981;">${product.discount}% OFF</span>
+        </div>
+        <div class="modal-detail">
+          <span>💵 You Save</span>
+          <span style="color: #10b981;">₹${savings.toLocaleString()}</span>
+        </div>
+        <div class="modal-detail">
+          <span>⭐ Rating</span>
+          <span>${product.rating} / 5</span>
+        </div>
+        <div class="modal-detail">
+          <span>💬 Total Reviews</span>
+          <span>${product.reviews.toLocaleString()}</span>
+        </div>
+        <div class="modal-detail">
+          <span>🎭 Sentiment</span>
+          <span style="color: ${product.sentiment === 'POSITIVE' ? '#10b981' : '#ef4444'};">${product.sentiment}</span>
+        </div>
+      `;
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('product-modal').classList.remove('active');
+    }
+
+    document.getElementById('product-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    loadProducts();
+  </script>
+</body>
+</html>
