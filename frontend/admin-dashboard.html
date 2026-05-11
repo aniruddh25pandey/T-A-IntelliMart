@@ -101,7 +101,7 @@
         <div class="relative">
             <div class="flex items-center space-x-4">
                 <div class="flex-1 relative">
-                    <input type="text" id="product-search-input" placeholder="Type product name (iPhone, Laptop, Grocery...)" class="w-full px-6 py-4 border-2 border-purple-200 rounded-xl text-lg font-semibold focus:border-purple-500 focus:outline-none" oninput="handleProductSearch()" onfocus="handleProductSearch()">
+                    <input type="text" id="product-search-input" placeholder="Type product name..." class="w-full px-6 py-4 border-2 border-purple-200 rounded-xl text-lg font-semibold focus:border-purple-500 focus:outline-none" oninput="handleProductSearch()" onfocus="handleProductSearch()">
                     <div id="search-suggestions" class="search-dropdown hidden"></div>
                 </div>
                 <button onclick="searchProducts()" class="gradient-primary text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover-lift pulse-soft">
@@ -221,8 +221,7 @@
 
 <footer class="bg-gray-800 text-white py-6 mt-12">
     <div class="max-w-7xl mx-auto px-6 text-center">
-        <p class="text-sm opacity-90">© 2024 T&A IntelliMart - Smart E-commerce Pricing System</p>
-        <p class="text-xs opacity-75 mt-2">Powered by Machine Learning & AI</p>
+        <p class="text-sm opacity-90">© 2026 T&A IntelliMart - Smart E-commerce Pricing System</p>
     </div>
 </footer>
 
@@ -253,6 +252,7 @@ function switchTab(tab) {
     const catTab = document.getElementById('tab-category');
     const prodTab = document.getElementById('tab-product');
     hideAllResults();
+    
     if (tab === 'category') {
         catSection.classList.remove('hidden');
         prodSection.classList.add('hidden');
@@ -288,7 +288,7 @@ async function loadCategories() {
                 select.appendChild(option);
             });
         }
-    } catch (error) { alert('Error: Is Flask server running?'); }
+    } catch (error) { console.error('Error loading categories:', error); }
 }
 
 async function loadOverallStats() {
@@ -304,11 +304,10 @@ async function loadOverallStats() {
 async function loadCategoryData() {
     const category = document.getElementById('category-select').value;
     if (!category) { alert('Please select a category!'); return; }
+    
+    hideAllResults();
     document.getElementById('loading').classList.remove('hidden');
-    document.getElementById('analysis-results').classList.add('hidden');
-    document.getElementById('empty-state').classList.add('hidden');
-    document.getElementById('product-results').classList.add('hidden');
-    document.getElementById('product-detail').classList.add('hidden');
+    
     try {
         const [graphsRes, insightsRes, recommendationsRes] = await Promise.all([
             fetch(`${API_URL}/graphs/${category}`),
@@ -318,13 +317,27 @@ async function loadCategoryData() {
         const graphs = await graphsRes.json();
         const insights = await insightsRes.json();
         const recommendations = await recommendationsRes.json();
+        
         document.getElementById('loading').classList.add('hidden');
-        document.getElementById('analysis-results').classList.remove('hidden');
-        updateStats(insights.insights);
-        renderGraphs(graphs);
-        showInsights(insights.insights);
-        showRecommendations(recommendations.recommendations);
-    } catch (error) { alert('Error loading data'); document.getElementById('loading').classList.add('hidden'); }
+        
+        if(graphs.success && insights.success && recommendations.success) {
+            document.getElementById('analysis-results').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+            
+            updateStats(insights.insights);
+            renderGraphs(graphs);
+            showInsights(insights.insights);
+            showRecommendations(recommendations.recommendations);
+        } else {
+            alert('Error loading data for this category. Check console.');
+            console.log('Graphs:', graphs, 'Insights:', insights, 'Recs:', recommendations);
+            document.getElementById('empty-state').classList.remove('hidden');
+        }
+        
+    } catch (error) { 
+        alert('Error loading data'); 
+        document.getElementById('loading').classList.add('hidden'); 
+    }
 }
 
 function handleProductSearch() {
@@ -380,7 +393,6 @@ async function searchProducts() {
                         <div class="text-right">
                             <div class="text-2xl font-bold text-purple-700">₹${p.final_price.toLocaleString()}</div>
                             <div class="text-sm text-teal-600">${p.discount}% off</div>
-                            <div class="text-sm">${p.rating}⭐ (${p.reviews})</div>
                         </div>
                     </div>
                 </div>`).join('');
@@ -402,6 +414,7 @@ async function loadProductInsights(productName) {
         if (data.success) {
             document.getElementById('product-detail').classList.remove('hidden');
             document.getElementById('empty-state').classList.add('hidden');
+            
             document.getElementById('product-category-badge').textContent = data.product.category;
             document.getElementById('product-name').textContent = data.product.name;
             document.getElementById('product-vendor').innerHTML = `<i class="fas fa-store mr-2"></i>${data.product.vendor}`;
@@ -409,17 +422,21 @@ async function loadProductInsights(productName) {
             document.getElementById('product-discount').textContent = `${data.product.discount}%`;
             document.getElementById('product-rating').textContent = `${data.product.rating}⭐`;
             document.getElementById('product-reviews').textContent = data.product.reviews.toLocaleString();
+            
             document.getElementById('ml-current-price').textContent = `₹${data.product.current_price.toLocaleString()}`;
             document.getElementById('ml-optimal-price').textContent = `₹${data.ml_prediction.optimal_price.toLocaleString()}`;
             document.getElementById('ml-action').textContent = data.ml_prediction.action;
             document.getElementById('ml-action-message').innerHTML = data.ml_prediction.action_message;
+            
             const catAnalysis = data.category_analysis;
             document.getElementById('category-analysis').innerHTML = `
-                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Category</p><p class="text-2xl font-bold text-purple-700">${catAnalysis.category}</p><p class="text-sm text-gray-600">${catAnalysis.total_in_category.toLocaleString()} total products</p></div>
-                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Avg Category Price</p><p class="text-2xl font-bold text-purple-700">₹${catAnalysis.avg_category_price.toLocaleString()}</p><p class="text-sm ${catAnalysis.price_vs_category > 0 ? 'text-red-600' : 'text-teal-600'}">${Math.abs(catAnalysis.price_vs_category).toFixed(1)}% ${catAnalysis.position}</p></div>
-                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Best Vendor in ${catAnalysis.category}</p><p class="text-2xl font-bold text-purple-700">${catAnalysis.best_vendor}</p><p class="text-sm text-gray-600">Rating: ${catAnalysis.best_vendor_rating}⭐</p></div>
-                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Category Averages</p><p class="text-xl font-bold text-purple-700">${catAnalysis.avg_rating}⭐ | ${catAnalysis.avg_discount}%</p><p class="text-sm text-gray-600">Rating | Discount</p></div>`;
+                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Category</p><p class="text-2xl font-bold text-purple-700">${catAnalysis.category}</p></div>
+                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Avg Price</p><p class="text-2xl font-bold text-purple-700">₹${catAnalysis.avg_category_price.toLocaleString()}</p></div>
+                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Best Vendor</p><p class="text-2xl font-bold text-purple-700">${catAnalysis.best_vendor}</p></div>
+                <div class="insight-box rounded-xl p-4"><p class="text-sm text-gray-600">Avg Rating</p><p class="text-2xl font-bold text-purple-700">${catAnalysis.avg_rating}⭐</p></div>`;
+            
             document.getElementById('product-insights-container').innerHTML = data.insights.map(i => `<div class="insight-box rounded-lg p-4 font-medium text-purple-900">${i}</div>`).join('');
+            
             const similarBody = document.getElementById('similar-products-body');
             similarBody.innerHTML = data.similar_products.length > 0 ? data.similar_products.map(p => `
                 <tr class="border-b hover:bg-purple-50 cursor-pointer" onclick="loadProductInsights('${p.name.replace(/'/g, "\\'")}')">
@@ -427,6 +444,7 @@ async function loadProductInsights(productName) {
                     <td class="px-4 py-3 text-right font-bold text-purple-700">₹${p.price.toLocaleString()}</td>
                     <td class="px-4 py-3 text-center">${p.discount}%</td><td class="px-4 py-3 text-center">${p.rating}⭐</td>
                 </tr>`).join('') : '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No similar products found</td></tr>';
+
         } else { alert(`Product not found: ${productName}`); }
     } catch (error) { alert('Error loading product insights'); document.getElementById('loading').classList.add('hidden'); }
 }
@@ -447,47 +465,43 @@ function updateStats(insights) {
 function renderGraphs(data) {
     Plotly.newPlot('graph1', [{
         x: data.price_vs_product.products, y: data.price_vs_product.prices, type: 'bar',
-        marker: { color: data.price_vs_product.prices, colorscale: [[0, '#ddd6fe'], [1, '#7c3aed']] },
-        text: data.price_vs_product.prices.map(p => `₹${p}`), textposition: 'outside'
-    }], { margin: { t: 20, b: 100, l: 60, r: 20 }, xaxis: { tickangle: -45 }, yaxis: { title: 'Price (₹)' } }, { responsive: true });
+        marker: { color: '#7c3aed' }
+    }], { margin: { t: 20, b: 100 }, xaxis: { tickangle: -45 } }, { responsive: true });
     
     Plotly.newPlot('graph2', [{
         x: data.discount_vs_price.prices, y: data.discount_vs_price.discounts, mode: 'markers', type: 'scatter',
-        marker: { size: 10, color: data.discount_vs_price.discounts, colorscale: [[0, '#ccfbf1'], [1, '#14b8a6']] },
-        text: data.discount_vs_price.vendors
-    }], { margin: { t: 20, b: 60, l: 60, r: 20 }, xaxis: { title: 'Price (₹)' }, yaxis: { title: 'Discount (%)' } }, { responsive: true });
+        marker: { size: 10, color: '#14b8a6' }
+    }], { margin: { t: 20, b: 60 } }, { responsive: true });
     
     Plotly.newPlot('graph3', [{
         x: data.rating_vs_price.prices, y: data.rating_vs_price.ratings, mode: 'markers', type: 'scatter',
-        marker: { size: 10, color: data.rating_vs_price.ratings, colorscale: 'Viridis' },
-        text: data.rating_vs_price.vendors
-    }], { margin: { t: 20, b: 60, l: 60, r: 20 }, xaxis: { title: 'Price (₹)' }, yaxis: { title: 'Rating', range: [0, 5.5] } }, { responsive: true });
+        marker: { size: 10, color: '#f59e0b' }
+    }], { margin: { t: 20, b: 60 } }, { responsive: true });
     
     Plotly.newPlot('graph4', [
-        { x: data.prices_by_vendor.vendors, y: data.prices_by_vendor.avg_prices, name: 'Avg Price', type: 'scatter', mode: 'lines+markers', line: { color: '#7c3aed', width: 3 }, yaxis: 'y' },
-        { x: data.prices_by_vendor.vendors, y: data.prices_by_vendor.avg_discounts, name: 'Avg Discount', type: 'scatter', mode: 'lines+markers', line: { color: '#14b8a6', width: 3 }, yaxis: 'y2' }
-    ], { margin: { t: 20, b: 80, l: 60, r: 60 }, xaxis: { tickangle: -45 }, yaxis: { title: 'Price (₹)' }, yaxis2: { title: 'Discount (%)', overlaying: 'y', side: 'right' }, legend: { orientation: 'h', y: -0.3 } }, { responsive: true });
+        { x: data.prices_by_vendor.vendors, y: data.prices_by_vendor.avg_prices, name: 'Avg Price', type: 'scatter', line: { color: '#7c3aed' } },
+        { x: data.prices_by_vendor.vendors, y: data.prices_by_vendor.avg_discounts, name: 'Avg Discount', type: 'scatter', line: { color: '#14b8a6' } }
+    ], { margin: { t: 20, b: 80 }, xaxis: { tickangle: -45 } }, { responsive: true });
 }
 
 function showInsights(insights) {
     document.getElementById('insights-container').innerHTML = insights.insights_messages.map(m => `<div class="insight-box rounded-lg p-4 font-medium text-purple-900">${m}</div>`).join('');
     document.getElementById('vendor-info').innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div><h4 class="text-lg font-bold text-purple-700 mb-3"><i class="fas fa-trophy mr-2"></i>Best Vendor</h4><p class="text-2xl font-bold text-purple-900">${insights.best_vendor}</p><p class="text-sm text-gray-600">Average Rating: ${insights.best_vendor_rating}⭐</p></div>
-            <div><h4 class="text-lg font-bold text-purple-700 mb-3"><i class="fas fa-medal mr-2"></i>Top Product</h4><p class="text-lg font-semibold text-purple-900">${insights.top_product.name}</p><p class="text-sm text-gray-600">Rating: ${insights.top_product.rating}⭐ | Price: ₹${insights.top_product.price}</p></div>
+            <div><h4 class="text-lg font-bold text-purple-700 mb-3"><i class="fas fa-trophy mr-2"></i>Best Vendor</h4><p class="text-2xl font-bold text-purple-900">${insights.best_vendor}</p><p class="text-sm text-gray-600">Rating: ${insights.best_vendor_rating}⭐</p></div>
+            <div><h4 class="text-lg font-bold text-purple-700 mb-3"><i class="fas fa-medal mr-2"></i>Top Product</h4><p class="text-lg font-semibold text-purple-900">${insights.top_product.name}</p><p class="text-sm text-gray-600">Rating: ${insights.top_product.rating}⭐</p></div>
         </div>`;
 }
 
 function showRecommendations(recommendations) {
     document.getElementById('recommendations-body').innerHTML = recommendations.map(rec => {
         const actionColor = rec.action === 'DECREASE' ? 'text-red-600 bg-red-100' : rec.action === 'INCREASE' ? 'text-teal-600 bg-teal-100' : 'text-purple-600 bg-purple-100';
-        const impactIcon = rec.action === 'DECREASE' ? '⬇️' : rec.action === 'INCREASE' ? '⬆️' : '➡️';
         return `<tr class="border-b hover:bg-purple-50">
             <td class="px-4 py-3 font-medium">${rec.product_name}</td><td class="px-4 py-3">${rec.vendor}</td>
             <td class="px-4 py-3 text-right font-bold">₹${rec.current_price.toLocaleString()}</td>
             <td class="px-4 py-3 text-right font-bold text-purple-700">₹${rec.optimal_price.toLocaleString()}</td>
             <td class="px-4 py-3 text-center"><span class="${actionColor} px-3 py-1 rounded-full text-sm font-bold">${rec.action}</span></td>
-            <td class="px-4 py-3 text-center font-bold">${impactIcon} ${rec.impact_percentage}%</td>
+            <td class="px-4 py-3 text-center font-bold">${rec.impact_percentage}%</td>
         </tr>`;
     }).join('');
 }

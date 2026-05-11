@@ -1,0 +1,28 @@
+{
+    "regression": {
+        "MSE": 695110.2191732894,
+        "RMSE": 833.7327024732143,
+        "MAE": 253.63902424710693,
+        "R2_Score": 0.9683168794956756
+    },
+    "classification": {
+        "Accuracy": 1.0,
+        "Precision": 1.0,
+        "Recall": 1.0,
+        "F1_Score": 1.0,
+        "Confusion_Matrix": [
+            [
+                61,
+                0
+            ],
+            [
+                0,
+                939
+            ]
+        ],
+        "Labels": [
+            "NEGATIVE",
+            "POSITIVE"
+        ]
+    }
+}

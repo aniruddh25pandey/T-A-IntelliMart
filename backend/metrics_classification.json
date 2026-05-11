@@ -1,0 +1,22 @@
+{
+    "Confusion_Matrix": [
+        [
+            61,
+            0
+        ],
+        [
+            0,
+            939
+        ]
+    ],
+    "Labels": [
+        "NEGATIVE",
+        "POSITIVE"
+    ],
+    "Accuracy": 1.0,
+    "Precision": 1.0,
+    "Recall": 1.0,
+    "F1_Score": 1.0,
+    "sample_size": 1000,
+    "calculated_at": "2026-05-05 14:51:21"
+}

@@ -297,11 +297,10 @@ This system helps:
 
 **👥 Team**
 
-
 | Developer | Role | GitHub |
 | --- | --- | --- |
-| Tanisha Khare | Developer | @aniruddh25pandey |
-| Aniruddh Pradeep Pandey | Developer | @TK404-1425 |
+| Tanisha Khare | Developer | @TK404-1425|
+| Aniruddh Pradeep Pandey | Developer | @aniruddh25pandey  |
 
 **Responsibilities**
 
@@ -359,11 +358,9 @@ This project is developed for **educational and portfolio purposes**.
 
 For queries or collaborations:
 
-
-
 | Contact | Details |
 | --- | --- |
-| 📧 Email | aniruddhpandey8423@gmail.com |
+| 📧 Email | aniruddhpandey8423@gmail.com or tanisha.khare5@gmail.com|
 | 💻 GitHub | @aniruddh25pandey / or @TK404-1425 |
 | 🔗 Project Link | T-A-IntelliMart |
 
